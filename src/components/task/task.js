@@ -70,7 +70,7 @@ const TaskPage = () => {
             event.stopPropagation();
             return;
         }
-        const formValues = {
+        const { id, ...formValues } = {
             ...formData,
             due_date: toYMD(formData.due_date),
         };
