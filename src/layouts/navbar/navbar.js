@@ -20,7 +20,6 @@ const Navbar = () => {
           <span className="visually-hidden">Toggle Menu</span>
         </button>
 
-        {/* Notifications */}
         <div className="d-flex p-2 align-items-center">
           <div className="border-end me-2 pe-2">
             <button className="btn border-0 notif-dropdown position-relative" onClick={() => setShowNotif(!showNotif)}>
@@ -31,7 +30,7 @@ const Navbar = () => {
                 </span>
               )}
             </button>
-            {showNotif && (
+            {/* {showNotif && (
               <div className="b-dropdown" style={{ width: '256px', maxHeight: '100vh', overflowX: 'auto' }}>
                 {notif.isLoading ? (
                   <div className="text-center">
@@ -63,7 +62,7 @@ const Navbar = () => {
                   </ul>
                 )}
               </div>
-            )}
+            )} */}
           </div>
 
           {/* User Menu */}

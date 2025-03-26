@@ -11,7 +11,7 @@ li {
     width: 260px;
     overflow-y: auto;
     overflow-x: hidden;
-    background-color: mix(#fff, mix(var(--primary), var(--secondary), 80%), 93%);
+    background-color: white;
     padding-bottom: 15px;
 }
 

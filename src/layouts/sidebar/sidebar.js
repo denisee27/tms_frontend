@@ -1,4 +1,3 @@
-// src/components/Sidebar.js
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useLoadingService } from '../../Services/loadingservice';
@@ -81,7 +80,7 @@ const Sidebar = () => {
     return (
         <div className={`nav-container position-fixed h-100 mh-100 sidenav d-flex flex-column flex-shrink-0 ${!isLoading ? 'left-99' : ''}`}>
             <div className="sidebar-heading p-0 text-center">
-                <img src="/assets/logo.png" alt="Logo" />
+                <img src="/logo192.png" alt="Logo" />
             </div>
             {isLoading && (
                 <div className="d-flex justify-content-center w-100 pe-md-3">
@@ -92,12 +91,12 @@ const Sidebar = () => {
             )}
             {!isLoading && (
                 <ul className="nav nav-pills flex-column mb-auto mt-1">
-                    <li className="nav-item">
-                        <Link to="/dashboard" className="nav-link px-3">
+                    <div className='nav-item'>
+                        <Link to="/dashboard" className="nav-link px-3 align-middle px-0 d-md-flex align-items-center text-center">
                             <i className="material-icons">dashboard</i>
                             Dashboard
                         </Link>
-                    </li>
+                    </div>
                     {navData.map((nav, i) => (
                         !nav.parent_id && (
                             <li key={i} className="nav-item">
@@ -113,7 +112,7 @@ const Sidebar = () => {
                                     <div onClick={() => toggleNav(i)} className={`nav-link px-3 align-middle px-0 d-md-flex align-items-center text-center cursor-pointer child-link ${isCollapsed[i] ? 'a-expanded' : ''}`}>
                                         <i className="material-icons">{nav.icon}</i>
                                         <span className="position-relative d-flex justify-content-between w-75">
-                                            <div>{nav.name}</div>
+                                            <div style={{ fontSize: "16px" }}>{nav.name}</div>
                                             {nav.task_count > 0 && (
                                                 <span className="mt-2 translate-middle p-1 bg-danger border border-light rounded-circle ms-1">
                                                     <span className="visually-hidden">New alerts</span>
@@ -143,7 +142,7 @@ const Sidebar = () => {
                         )
                     ))}
                     <li className="nav-item">
-                        <a href="/manual_book.pdf" target="_blank" className="nav-link px-3">
+                        <a href="/manual_book.pdf" target="_blank" className="nav-link px-3 align-middle px-0 d-md-flex align-items-center text-center">
                             <i className="material-icons">help</i>
                             Help
                         </a>
