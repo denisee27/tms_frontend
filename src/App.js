@@ -2,13 +2,19 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import './App.css';
 import TaskPage from "./components/task/task";
+import { LoadingProvider } from "./Services/loadingservice";
+import Layout from "./layouts/layout";
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<TaskPage />} />
-      </Routes>
-    </BrowserRouter>
+    <LoadingProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route element={<Layout />}>
+            <Route path="/" element={<TaskPage />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </LoadingProvider>
   );
 }
 export default App;

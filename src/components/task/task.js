@@ -259,6 +259,7 @@ const TaskPage = () => {
                             ))}
                         </tbody>
                     </Table>
+
                     <div className='d-flex justify-content-between'>
                         <div className='flex-nowrap d-flex small align-items-center'>
                             <label className='me-2'>Limit: </label>

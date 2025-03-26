@@ -1,0 +1,224 @@
+html {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+}
+
+.toast-container {
+    position: fixed !important;
+}
+
+.btn-link {
+    text-decoration: none !important;
+}
+
+a {
+    text-decoration: none;
+}
+
+a.disabled {
+    opacity: 0.65;
+    pointer-events: none;
+}
+
+.btn .material-icons {
+    font-size: 1.35rem;
+}
+
+.btn {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+}
+
+input[type="search"]::-webkit-search-decoration,
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-results-button,
+input[type="search"]::-webkit-search-results-decoration {
+    appearance: none;
+    display: none;
+}
+
+.btn-close-search {
+    background-color: #f8f9fa !important;
+    margin-top: 2px;
+    margin-right: 2px;
+}
+
+input[required]:not([type="radio"]),
+ng-select[required],
+select[required],
+textarea[required]+label::after {
+    content: " *";
+    color: red;
+    vertical-align: top;
+}
+
+.required::after {
+    content: " *";
+    color: red;
+    vertical-align: top;
+}
+
+label.floated {
+    opacity: 0.65;
+    transform: scale(0.85) translateY(-0.2rem) translateX(-1rem);
+    font-weight: normal;
+}
+
+.ng-select {
+    height: auto !important;
+}
+
+.ng-select .ng-select-container {
+    background: none !important;
+    color: unset !important;
+    border-radius: unset !important;
+    border: none !important;
+    min-height: 22px !important;
+    height: auto !important;
+    border-color: unset !important;
+    box-shadow: none !important;
+}
+
+.ng-select .ng-value-container .ng-input {
+    top: unset !important;
+    padding-left: 0px !important;
+}
+
+.step-container {
+    flex-grow: 1;
+    position: relative;
+    opacity: 0.7;
+}
+
+.step-container::before {
+    background-color: #6c757d !important;
+    width: 100%;
+    height: 2px;
+    position: absolute;
+    top: 21%;
+    content: "";
+    z-index: 0;
+    display: flex;
+    flex-grow: 1;
+}
+
+.step-container.active {
+    opacity: 1;
+}
+
+.step-container.reject .icon-step {
+    background: #dc3545 !important;
+}
+
+.icon-step {
+    margin-bottom: 0.3rem;
+}
+
+.btn-group-toggle [type="radio"],
+.btn-group-toggle [type="checkbox"] {
+    display: none;
+}
+
+.left-99 {
+    left: -399px !important;
+}
+
+.left-0 {
+    left: 0 !important;
+}
+
+.table tr,
+.table td,
+.table th {
+    vertical-align: middle;
+}
+
+th[sortable] {
+    cursor: pointer;
+    user-select: none;
+}
+
+th[sortable].asc::after,
+th[sortable].desc::after {
+    content: "";
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    transition: all 0.2s ease;
+}
+
+th[sortable].desc::after {
+    transform: rotate(180deg);
+}
+
+.table th {
+    border-bottom: none !important;
+    background-color: #f7f7f7;
+}
+
+.table tbody {
+    border-top: none !important;
+}
+
+.modal-transparent .modal-content {
+    background: transparent !important;
+    border: 0 !important;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.qr {
+    width: 100%;
+}
+
+.scan {
+    font-size: 60px;
+}
+
+.form-floating .textareabox {
+    height: 100px;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="number"] {
+    appearance: textfield;
+}
+
+.ngb-dp-today .btn-light {
+    background-color: #cce5ff;
+}
+
+.bg-gray {
+    background-color: #6c757d;
+}
+
+.qrcode canvas {
+    max-width: 100% !important;
+    height: auto !important;
+    width: unset !important;
+}
+
+.input-group .form-floating+div {
+    background: #f8f9fa;
+}
+
+.webcam-wrapper {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.webcam-wrapper video {
+    width: 100% !important;
+    height: 100% !important;
+    margin-top: -2px !important;
+    border-top-right-radius: 0.25rem !important;
+    border-top-left-radius: 0.25rem !important;
+}
