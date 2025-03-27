@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useLoadingService } from '../../Services/loadingservice';
 import './sidebar.css';
+import { useSidebarService } from '../../Services/sidebarservice';
 
 const Sidebar = () => {
     const { isLoading } = useLoadingService();
     const [isCollapsed, setIsCollapsed] = useState({});
+    const { isOpen } = useSidebarService();
     const location = useLocation();
     let navData = [{
         "id": 1,
@@ -69,16 +71,15 @@ const Sidebar = () => {
     const isActive = (link) => location.pathname === `/${link}`;
 
     useEffect(() => {
-        console.log(isLoading);
         const handleResize = () => {
             // Handle resize logic if needed
         };
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
-    }, [isLoading]);
+    }, []);
 
     return (
-        <div className={`nav-container position-fixed h-100 mh-100 sidenav d-flex flex-column flex-shrink-0 ${!isLoading ? 'left-99' : ''}`}>
+        <div style={{ left: !isOpen ? "-1000px" : "" }} className="nav-container position-fixed h-100 mh-100 sidenav d-flex flex-column flex-shrink-0">
             <div className="sidebar-heading p-0 text-center">
                 <img src="/logo192.png" alt="Logo" />
             </div>

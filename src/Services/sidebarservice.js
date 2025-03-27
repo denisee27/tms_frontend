@@ -26,4 +26,4 @@ export const SidebarProvider = ({ children }) => {
     );
 };
 
-export const useSidenav = () => useContext(SidebarContext);
+export const useSidebarService = () => useContext(SidebarContext);

@@ -1,44 +1,176 @@
-.App {
-  text-align: center;
+html {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
 }
 
-.react-date-picker__wrapper {
-  border: none !important;
-  box-shadow: none !important;
+.toast-container {
+  position: fixed !important;
 }
 
-.App-logo {
-  height: 40vmin;
+.btn-link {
+  text-decoration: none !important;
+}
+
+a {
+  text-decoration: none;
+}
+
+a.disabled {
+  opacity: 0.65;
   pointer-events: none;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.btn .material-icons {
+  font-size: 1.35rem;
+  display: inline-flex;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  align-items: center;
 }
 
-.App-link {
-  color: #61dafb;
+input[type="search"]::-webkit-search-decoration,
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-results-button,
+input[type="search"]::-webkit-search-results-decoration {
+  appearance: none;
+  display: none;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+.required::after {
+  content: " *";
+  color: red;
+  vertical-align: top;
+}
+
+label.floated {
+  opacity: 0.65;
+  transform: scale(0.85) translateY(-0.2rem) translateX(-1rem);
+  font-weight: normal;
+}
+
+.ng-select-container {
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  min-height: 22px !important;
+}
+
+.ng-dropdown-panel {
+  z-index: 1020 !important;
+}
+
+.step-container {
+  flex-grow: 1;
+  position: relative;
+  opacity: 0.7;
+}
+
+.step-container::before {
+  background-color: gray !important;
+  width: 100%;
+  height: 2px;
+  position: absolute;
+  top: 21%;
+  content: "";
+  z-index: 0;
+}
+
+.step-container.active {
+  opacity: 1;
+}
+
+.icon-step {
+  margin-bottom: 0.3rem;
+}
+
+th[sortable] {
+  cursor: pointer;
+  user-select: none;
+}
+
+th[sortable].asc::after,
+th[sortable].desc::after {
+  content: "";
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  background-size: cover;
+}
+
+th[sortable].desc::after {
+  transform: rotate(180deg);
+}
+
+.modal-transparent .modal-content {
+  background: transparent !important;
+  border: 0 !important;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.qr {
+  width: 100%;
+}
+
+.scan {
+  font-size: 60px;
+}
+
+.form-floating .textareabox {
+  height: 100px;
+}
+
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  appearance: textfield;
+}
+
+
+.content-main {
+  transition: all 0.3s ease-in-out;
+  /* Gantilah dengan nilai yang sesuai dengan $transition-base */
+}
+
+.loading {
+  height: 5px;
+  background-color: #007bff;
+  /* Gantilah dengan nilai konkret dari $primary */
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 99999;
+  opacity: 1;
+  animation: fadeinout 1s linear infinite;
+}
+
+@keyframes fadeinout {
+
+  0%,
+  100% {
+    opacity: 0.2;
   }
 
-  to {
-    transform: rotate(360deg);
+  50% {
+    opacity: 1;
   }
+}
+
+.sidenav-opened {
+  padding-left: 273px;
+}
+
+.navbar-opened {
+  padding-top: 117px;
+}
+
+.auth-timeout {
+  z-index: 99999;
+  backdrop-filter: blur(15px);
 }

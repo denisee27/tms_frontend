@@ -181,120 +181,126 @@ const TaskPage = () => {
 
     return (
         <>
-            <div className='mx-4 my-5 card p-4'>
-                <h1>Task Management System</h1>
-                <div className='text-end'>
-                    <Button variant='primary' className='float-left me-3' onClick={addModal}>Add Task</Button>
-                    <Button variant='warning' className='float-left' onClick={() => fetchTasks()}>
-                        <i class="fa-solid fa-arrows-rotate"></i>
-                    </Button>
-                </div>
-                <div className='mt-2'>
-                    <Table className='text-center' hover bordered striped>
-                        <thead>
-                            <th style={{ width: "5%" }}>No</th>
-                            <th>Title</th>
-                            <th>Description</th>
-                            <th>
-                                <div className='d-flex justify-content-center'>
-                                    Due Date
-                                    <div className='ms-2'>
-                                        <div onClick={() => setSortDueDate(sortDueDate == null ? 'ASC' : sortDueDate == 'ASC' ? 'DESC' : null)} style={{ cursor: 'pointer' }}>
-                                            {sortDueDate == 'DESC' ? (
-                                                <i class="fa-solid fa-sort-down"></i>
-                                            ) : sortDueDate == 'ASC' ? (
-                                                <i class="fa-solid fa-sort-up"></i>
-                                            ) : (
-                                                <i class="fa-solid fa-sort"></i>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
-                            </th>
-                            <th>Progress</th>
-                            <th>Created At</th>
-                            <th>Action</th>
-                        </thead>
-                        <tbody>
-                            {datas.map((data, index) => (
-                                <tr>
-                                    <td>{index + 1} </td>
-                                    <td>{data.title} </td>
-                                    <td>{data.description}</td>
-                                    <td>{moment(data.due_date).format('D MMMM YYYY')}</td>
-                                    <td>
-                                        <div className="d-flex justify-content-center">
-                                            <Form.Check type="switch" checked={data.status == 1} onChange={() => handleSwitchTask(data.id, data.status)} />
-                                            {data.status == 1 ? (
-                                                <span className='text-light badge bg-success'>
-                                                    Compeleted
-                                                </span>
-                                            ) : (
-                                                <span className='text-light badge bg-warning'>
-                                                    Pending
-                                                </span>
-                                            )}
-                                        </div>
-                                    </td>
-                                    <td>{moment(data.createdAt).format('D MMMM YYYY - hh:mm')} </td>
-                                    <td>
-                                        <Dropdown>
-                                            <Dropdown.Toggle variant="outline-primary" id="dropdown-basic">
-                                                Action
-                                            </Dropdown.Toggle>
+            <div className='col-sm-12 mx-auto'>
+                <div className="card">
+                    <div className="card-body">
 
-                                            <Dropdown.Menu>
-                                                <Dropdown.Item href="#/action-1" onClick={() => handleEdit(data)}>
-                                                    <i class="fa-solid fa-pen me-2"></i>
-                                                    Edit
-                                                </Dropdown.Item>
-                                                <Dropdown.Item onClick={() => handleDelete(data)} className='text-danger'>
-                                                    <i class="fa-solid fa-trash-can me-2"></i>
-                                                    Delete
-                                                </Dropdown.Item>
-                                            </Dropdown.Menu>
-                                        </Dropdown>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </Table>
-
-                    <div className='d-flex justify-content-between'>
-                        <div className='flex-nowrap d-flex small align-items-center'>
-                            <label className='me-2'>Limit: </label>
-                            <select
-                                className='form-select form-select-sm'
-                                id="limitSelect"
-                                value={limit}
-                                style={{ height: "30px" }}
-                                onChange={(e) => setLimit(parseInt(e.target.value))}
-                            >
-                                <option value="2">2</option>
-                                <option value="5">5</option>
-                                <option value="10">10</option>
-                                <option value="20">20</option>
-                            </select>
+                        <h1>Task Management System</h1>
+                        <div className='text-end'>
+                            <Button variant='primary' className='float-left me-3' onClick={addModal}>Add Task</Button>
+                            <Button variant='warning' className='float-left' onClick={() => fetchTasks()}>
+                                <i className="fa-solid fa-arrows-rotate"></i>
+                            </Button>
                         </div>
-                        <div className='d-flex align-items-center'>
-                            <div className='me-2'>
-                                Total : {datas.length}
+                        <div className='mt-2'>
+                            <Table className='text-center' hover bordered striped>
+                                <thead>
+                                    <tr>
+                                        <th style={{ width: "5%" }}>No</th>
+                                        <th>Title</th>
+                                        <th>Description</th>
+                                        <th>
+                                            <div className='d-flex justify-content-center'>
+                                                Due Date
+                                                <div className='ms-2'>
+                                                    <div onClick={() => setSortDueDate(sortDueDate == null ? 'ASC' : sortDueDate == 'ASC' ? 'DESC' : null)} style={{ cursor: 'pointer' }}>
+                                                        {sortDueDate == 'DESC' ? (
+                                                            <i className="fa-solid fa-sort-down"></i>
+                                                        ) : sortDueDate == 'ASC' ? (
+                                                            <i className="fa-solid fa-sort-up"></i>
+                                                        ) : (
+                                                            <i className="fa-solid fa-sort"></i>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </th>
+                                        <th>Progress</th>
+                                        <th>Created At</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {datas.map((data, index) => (
+                                        <tr>
+                                            <td>{index + 1} </td>
+                                            <td>{data.title} </td>
+                                            <td>{data.description}</td>
+                                            <td>{moment(data.due_date).format('D MMMM YYYY')}</td>
+                                            <td>
+                                                <div className="d-flex justify-content-center">
+                                                    <Form.Check type="switch" checked={data.status == 1} onChange={() => handleSwitchTask(data.id, data.status)} />
+                                                    {data.status == 1 ? (
+                                                        <span className='text-light badge bg-success'>
+                                                            Compeleted
+                                                        </span>
+                                                    ) : (
+                                                        <span className='text-light badge bg-warning'>
+                                                            Pending
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </td>
+                                            <td>{moment(data.createdAt).format('D MMMM YYYY - hh:mm')} </td>
+                                            <td>
+                                                <Dropdown>
+                                                    <Dropdown.Toggle variant="outline-primary" id="dropdown-basic">
+                                                        Action
+                                                    </Dropdown.Toggle>
+
+                                                    <Dropdown.Menu>
+                                                        <Dropdown.Item href="#/action-1" onClick={() => handleEdit(data)}>
+                                                            <i className="fa-solid fa-pen me-2"></i>
+                                                            Edit
+                                                        </Dropdown.Item>
+                                                        <Dropdown.Item onClick={() => handleDelete(data)} className='text-danger'>
+                                                            <i className="fa-solid fa-trash-can me-2"></i>
+                                                            Delete
+                                                        </Dropdown.Item>
+                                                    </Dropdown.Menu>
+                                                </Dropdown>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </Table>
+                            <div className='d-flex justify-content-between'>
+                                <div className='flex-nowrap d-flex small align-items-center'>
+                                    <label className='me-2'>Limit: </label>
+                                    <select
+                                        className='form-select form-select-sm'
+                                        id="limitSelect"
+                                        value={limit}
+                                        style={{ height: "30px" }}
+                                        onChange={(e) => setLimit(parseInt(e.target.value))}
+                                    >
+                                        <option value="2">2</option>
+                                        <option value="5">5</option>
+                                        <option value="10">10</option>
+                                        <option value="20">20</option>
+                                    </select>
+                                </div>
+                                <div className='d-flex align-items-center'>
+                                    <div className='me-2'>
+                                        Total : {datas.length}
+                                    </div>
+                                    <button className='btn btn-sm border-0' onClick={() => setCurrentPage(1)} disabled={currentPage === 1} >
+                                        <i className="fa-solid fa-angles-left"></i>
+                                    </button>
+                                    <button className='btn btn-sm border-0' onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} disabled={currentPage === 1} >
+                                        <i className="fa-solid fa-chevron-left"></i>
+                                    </button>
+                                    <div>
+                                        <span> {currentPage} / {totalPages} </span>
+                                    </div>
+                                    <button className='btn btn-sm border-0' onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages}>
+                                        <i className="fa-solid fa-chevron-right"></i>
+                                    </button>
+                                    <button className='btn btn-sm border-0' onClick={() => setCurrentPage(totalPages)} disabled={currentPage === totalPages} >
+                                        <i className="fa-solid fa-angles-right"></i>
+                                    </button>
+                                </div>
                             </div>
-                            <button className='btn btn-sm border-0' onClick={() => setCurrentPage(1)} disabled={currentPage === 1} >
-                                <i class="fa-solid fa-angles-left"></i>
-                            </button>
-                            <div>
-                                <button className='btn btn-sm border-0' onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} disabled={currentPage === 1} >
-                                    <i class="fa-solid fa-chevron-left"></i>
-                                </button>
-                                <span> {currentPage} / {totalPages} </span>
-                                <button className='btn btn-sm border-0' onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages}>
-                                    <i class="fa-solid fa-chevron-right"></i>
-                                </button>
-                            </div>
-                            <button className='btn btn-sm border-0' onClick={() => setCurrentPage(totalPages)} disabled={currentPage === totalPages} >
-                                <i class="fa-solid fa-angles-right"></i>
-                            </button>
                         </div>
                     </div>
                 </div>

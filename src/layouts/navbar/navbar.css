@@ -26,6 +26,17 @@ a {
     font-size: 10px;
 }
 
+#dropdown-basic {
+    border: none;
+    background-color: transparent;
+}
+
+#dropdown-basic::after {
+    display: none;
+    background-color: transparent;
+    border-radius: 100px;
+}
+
 .notif-list {
     list-style: none;
     padding: 2px;

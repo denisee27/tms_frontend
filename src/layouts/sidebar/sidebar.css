@@ -58,6 +58,7 @@ li {
 }
 
 .nav-link {
+    color: var(--primary);
     padding: 10px 20px;
 }
 
