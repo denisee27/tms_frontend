@@ -1,6 +1,4 @@
-/* eslint-disable eqeqeq */
-/* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { useState } from 'react';
 import { Button, FloatingLabel, Form, Table } from 'react-bootstrap';
 import Modal from 'react-bootstrap/Modal';
@@ -8,18 +6,22 @@ import Dropdown from 'react-bootstrap/Dropdown';
 import DatePicker from "react-date-picker";
 import "react-date-picker/dist/DatePicker.css";
 import "react-calendar/dist/Calendar.css";
-import axios from 'axios';
 import moment from 'moment';
-import { swalToastError, swalToastSuccess } from '../../utils/alertSwal';
-import { toYMD } from '../../utils/dateConvert';
+import { swalToastSuccess } from '../../Services/alertswal';
+import { toYMD } from '../../Services/dateconvert';
+import { useHttpService } from '../../Services/httpservice';
+// import { usePageQueryService } from '../../Services/pagequery';
 
 const TaskPage = () => {
     const apiUrl = process.env.REACT_APP_API_URL;
-    const [formData, setFormData] = useState({
-        title: '',
-        description: '',
-        due_date: new Date().setDate(new Date().getDate() + 7),
-    })
+    const initialFormData = {
+        title: "",
+        description: "",
+        due_date: "",
+    };
+    const [formData, setFormData] = useState(initialFormData)
+    const { get, destroy, put, post, patch } = useHttpService();
+    // const { queryPage } = usePageQueryService();
     const [validated, setValidated] = useState(false);
     const [datas, setDatas] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
@@ -27,45 +29,33 @@ const TaskPage = () => {
     const [limit, setLimit] = useState(10);
     const [sortDueDate, setSortDueDate] = useState();
 
-    useEffect(() => {
-        fetchTasks(currentPage, limit);
-    }, [currentPage, limit, sortDueDate]);
-
-    const fetchTasks = async (page, limit) => {
-        try {
-            const response = await axios.get(`${apiUrl}/tasks`, {
-                params: { page, limit, sortDueDate }
-            });
-            setDatas(response.data.data);
-            setTotalPages(response.data.totalPages);
-        } catch (error) {
-            console.error("Error fetching tasks:", error);
+    const fetchTasks = useCallback(async () => {
+        const response = await get("tasks");
+        if (response?.success) {
+            setDatas(response.response?.data);
+            setTotalPages(response.data?.totalPages || 1);
         }
-    };
+    }, [get]);
+
+    useEffect(() => {
+        fetchTasks();
+    }, [fetchTasks]);
 
     const handleSubmitDelete = async () => {
-        try {
-            await axios.delete(`${apiUrl}/tasks/delete/${formData.id}`, formData, {
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            });
+        const response = await destroy("tasks/delete/" + formData.id);
+        if (response.success) {
             swalToastSuccess(`Delete Task Success`);
-            resetFormData();
-            fetchTasks();
-            deleteCloseModal();
-        } catch (error) {
-            swalToastError(error)
-            resetFormData();
-            deleteCloseModal();
         }
+        setFormData(initialFormData);
+        setValidated(false);
+        fetchTasks();
+        deleteCloseModal();
     }
 
-    const handleEditSubmit = async (event) => {
+    const handleUpdate = async (event) => {
         event.preventDefault();
         const form = event.currentTarget;
         setValidated(true);
-
         if (form.checkValidity() === false) {
             event.stopPropagation();
             return;
@@ -74,21 +64,14 @@ const TaskPage = () => {
             ...formData,
             due_date: toYMD(formData.due_date),
         };
-        try {
-            await axios.put(`${apiUrl}/tasks/update/${formData.id}`, formValues, {
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            });
+        const response = await put(`tasks/update/${formData.id}`, formValues);
+        if (response.success) {
             swalToastSuccess(`Update Task Success`);
-            resetFormData();
-            fetchTasks();
-            editCloseModal();
-        } catch (error) {
-            swalToastError(error)
-            resetFormData();
-            editCloseModal();
         }
+        setFormData(initialFormData);
+        setValidated(false);
+        fetchTasks();
+        editCloseModal();
     }
 
     const handleSubmit = async (event) => {
@@ -103,47 +86,23 @@ const TaskPage = () => {
             ...formData,
             due_date: toYMD(formData.due_date),
         };
-        try {
-            await axios.post(`${apiUrl}/tasks/create`, formValues, {
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            });
+        const response = await post(`tasks/create`, formValues);
+        if (response.success) {
             swalToastSuccess(`Create Task Success`);
-            resetFormData();
-            fetchTasks();
-            addCloseModal();
-        } catch (error) {
-            swalToastError(error)
-            resetFormData();
-            addCloseModal();
         }
+        setFormData(initialFormData);
+        setValidated(false);
+        fetchTasks();
+        addCloseModal();
     };
 
     const handleSwitchTask = async (id, status) => {
-        try {
-            await axios.patch(`${apiUrl}/tasks/mark/${id}`, {
-                status: !status
-            });
+        const response = await patch(`${apiUrl}/tasks/mark/${id}`, { status: !status });
+        if (response.success) {
             swalToastSuccess(`Marked as completed Update to ${!status ? 'Completed' : 'Pending'}`);
-            fetchTasks();
-        } catch (error) {
-            swalToastError(error)
         }
+        fetchTasks();
     }
-
-    const handleDate = (date) => {
-        setFormData({ ...formData, due_date: toYMD(date) });
-    };
-
-    const resetFormData = () => {
-        setFormData({
-            title: "",
-            description: "",
-            due_date: new Date().setDate(new Date().getDate() + 7),
-        });
-        setValidated(false);
-    };
 
     const [addshow, addShowState] = useState(false);
     const addModal = () => addShowState(true);
@@ -157,10 +116,9 @@ const TaskPage = () => {
     }
 
     const [editShow, editShowState] = useState(false);
-    const editModal = () => editShowState(true);
     const editCloseModal = () => editShowState(false);
     const handleEdit = (data) => {
-        editModal(true);
+        editShowState(true);
         setFormData({
             id: data.id,
             title: data.title,
@@ -170,10 +128,9 @@ const TaskPage = () => {
     };
 
     const [deleteshow, deleteShowState] = useState(false);
-    const deleteModal = () => deleteShowState(true);
     const deleteCloseModal = () => deleteShowState(false);
     const handleDelete = (data) => {
-        deleteModal(true);
+        deleteShowState(true);
         setFormData({
             id: data.id,
         });
@@ -184,124 +141,132 @@ const TaskPage = () => {
             <div className='col-sm-12 mx-auto'>
                 <div className="card">
                     <div className="card-body">
-
-                        <h1>Task Management System</h1>
-                        <div className='text-end'>
-                            <Button variant='primary' className='float-left me-3' onClick={addModal}>Add Task</Button>
-                            <Button variant='warning' className='float-left' onClick={() => fetchTasks()}>
-                                <i className="fa-solid fa-arrows-rotate"></i>
-                            </Button>
-                        </div>
-                        <div className='mt-2'>
-                            <Table className='text-center' hover bordered striped>
-                                <thead>
-                                    <tr>
-                                        <th style={{ width: "5%" }}>No</th>
-                                        <th>Title</th>
-                                        <th>Description</th>
-                                        <th>
-                                            <div className='d-flex justify-content-center'>
-                                                Due Date
-                                                <div className='ms-2'>
-                                                    <div onClick={() => setSortDueDate(sortDueDate == null ? 'ASC' : sortDueDate == 'ASC' ? 'DESC' : null)} style={{ cursor: 'pointer' }}>
-                                                        {sortDueDate == 'DESC' ? (
-                                                            <i className="fa-solid fa-sort-down"></i>
-                                                        ) : sortDueDate == 'ASC' ? (
-                                                            <i className="fa-solid fa-sort-up"></i>
-                                                        ) : (
-                                                            <i className="fa-solid fa-sort"></i>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </th>
-                                        <th>Progress</th>
-                                        <th>Created At</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {datas.map((data, index) => (
-                                        <tr>
-                                            <td>{index + 1} </td>
-                                            <td>{data.title} </td>
-                                            <td>{data.description}</td>
-                                            <td>{moment(data.due_date).format('D MMMM YYYY')}</td>
-                                            <td>
-                                                <div className="d-flex justify-content-center">
-                                                    <Form.Check type="switch" checked={data.status == 1} onChange={() => handleSwitchTask(data.id, data.status)} />
-                                                    {data.status == 1 ? (
-                                                        <span className='text-light badge bg-success'>
-                                                            Compeleted
-                                                        </span>
-                                                    ) : (
-                                                        <span className='text-light badge bg-warning'>
-                                                            Pending
-                                                        </span>
-                                                    )}
-                                                </div>
-                                            </td>
-                                            <td>{moment(data.createdAt).format('D MMMM YYYY - hh:mm')} </td>
-                                            <td>
-                                                <Dropdown>
-                                                    <Dropdown.Toggle variant="outline-primary" id="dropdown-basic">
-                                                        Action
-                                                    </Dropdown.Toggle>
-
-                                                    <Dropdown.Menu>
-                                                        <Dropdown.Item href="#/action-1" onClick={() => handleEdit(data)}>
-                                                            <i className="fa-solid fa-pen me-2"></i>
-                                                            Edit
-                                                        </Dropdown.Item>
-                                                        <Dropdown.Item onClick={() => handleDelete(data)} className='text-danger'>
-                                                            <i className="fa-solid fa-trash-can me-2"></i>
-                                                            Delete
-                                                        </Dropdown.Item>
-                                                    </Dropdown.Menu>
-                                                </Dropdown>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </Table>
-                            <div className='d-flex justify-content-between'>
-                                <div className='flex-nowrap d-flex small align-items-center'>
-                                    <label className='me-2'>Limit: </label>
-                                    <select
-                                        className='form-select form-select-sm'
-                                        id="limitSelect"
-                                        value={limit}
-                                        style={{ height: "30px" }}
-                                        onChange={(e) => setLimit(parseInt(e.target.value))}
-                                    >
-                                        <option value="2">2</option>
-                                        <option value="5">5</option>
-                                        <option value="10">10</option>
-                                        <option value="20">20</option>
-                                    </select>
-                                </div>
-                                <div className='d-flex align-items-center'>
-                                    <div className='me-2'>
-                                        Total : {datas.length}
-                                    </div>
-                                    <button className='btn btn-sm border-0' onClick={() => setCurrentPage(1)} disabled={currentPage === 1} >
-                                        <i className="fa-solid fa-angles-left"></i>
-                                    </button>
-                                    <button className='btn btn-sm border-0' onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} disabled={currentPage === 1} >
-                                        <i className="fa-solid fa-chevron-left"></i>
-                                    </button>
-                                    <div>
-                                        <span> {currentPage} / {totalPages} </span>
-                                    </div>
-                                    <button className='btn btn-sm border-0' onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages}>
-                                        <i className="fa-solid fa-chevron-right"></i>
-                                    </button>
-                                    <button className='btn btn-sm border-0' onClick={() => setCurrentPage(totalPages)} disabled={currentPage === totalPages} >
-                                        <i className="fa-solid fa-angles-right"></i>
-                                    </button>
-                                </div>
+                        <div className='d-flex justify-content-between'>
+                            <h4 className='card-title'>Task Management System</h4>
+                            <div className='text-end'>
+                                <Button variant='primary' className='float-left me-2' onClick={addModal}>Add Task</Button>
+                                <Button variant='warning' className='float-left' onClick={() => fetchTasks()}>
+                                    <i className="fa-solid fa-arrows-rotate"></i>
+                                </Button>
                             </div>
                         </div>
+                        {datas.length > 0 ? (
+                            <div className='mt-2'>
+                                <Table className='text-center' hover bordered striped>
+                                    <thead>
+                                        <tr>
+                                            <th style={{ width: "5%" }}>No</th>
+                                            <th>Title</th>
+                                            <th>Description</th>
+                                            <th>
+                                                <div className='d-flex justify-content-center'>
+                                                    Due Date
+                                                    <div className='ms-2'>
+                                                        <div onClick={() => setSortDueDate(sortDueDate === null ? 'ASC' : sortDueDate === 'ASC' ? 'DESC' : null)} style={{ cursor: 'pointer' }}>
+                                                            {sortDueDate === 'DESC' ? (
+                                                                <i className="fa-solid fa-sort-down"></i>
+                                                            ) : sortDueDate === 'ASC' ? (
+                                                                <i className="fa-solid fa-sort-up"></i>
+                                                            ) : (
+                                                                <i className="fa-solid fa-sort"></i>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </th>
+                                            <th>Progress</th>
+                                            <th>Created At</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {datas.map((data, index) => (
+                                            <tr key={data.id}>
+                                                <td>{index + 1} </td>
+                                                <td>{data.title} </td>
+                                                <td>{data.description}</td>
+                                                <td>{moment(data.due_date).format('DD MMMM YYYY')}</td>
+                                                <td>
+                                                    <div className="d-flex justify-content-center">
+                                                        <Form.Check type="switch" checked={data.status === true} onChange={() => handleSwitchTask(data.id, data.status)} />
+                                                        {data.status === true ? (
+                                                            <span className='text-light badge bg-success'>
+                                                                Compeleted
+                                                            </span>
+                                                        ) : (
+                                                            <span className='text-light badge bg-warning'>
+                                                                Pending
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </td>
+                                                <td>{moment(data.createdAt).format('D MMMM YYYY - hh:mm')} </td>
+                                                <td>
+                                                    <Dropdown>
+                                                        <Dropdown.Toggle variant="outline-primary" >
+                                                            Action
+                                                        </Dropdown.Toggle>
+
+                                                        <Dropdown.Menu>
+                                                            <Dropdown.Item href="#/action-1" onClick={() => handleEdit(data)}>
+                                                                <i className="fa-solid fa-pen me-2"></i>
+                                                                Edit
+                                                            </Dropdown.Item>
+                                                            <Dropdown.Item onClick={() => handleDelete(data)} className='text-danger'>
+                                                                <i className="fa-solid fa-trash-can me-2"></i>
+                                                                Delete
+                                                            </Dropdown.Item>
+                                                        </Dropdown.Menu>
+                                                    </Dropdown>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </Table>
+                                <div className='d-flex justify-content-between'>
+                                    <div className='flex-nowrap d-flex small align-items-center'>
+                                        <label className='me-2'>Limit: </label>
+                                        <select
+                                            className='form-select form-select-sm'
+                                            id="limitSelect"
+                                            value={limit}
+                                            style={{ height: "30px" }}
+                                            onChange={(e) => setLimit(parseInt(e.target.value))}
+                                        >
+                                            <option value="2">2</option>
+                                            <option value="5">5</option>
+                                            <option value="10">10</option>
+                                            <option value="20">20</option>
+                                        </select>
+                                    </div>
+                                    <div className='d-flex align-items-center'>
+                                        <div className='me-2'>
+                                            Total : {datas.length}
+                                        </div>
+                                        <button className='btn btn-sm border-0' onClick={() => setCurrentPage(1)} disabled={currentPage === 1} >
+                                            <i className="fa-solid fa-angles-left"></i>
+                                        </button>
+                                        <button className='btn btn-sm border-0' onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} disabled={currentPage === 1} >
+                                            <i className="fa-solid fa-chevron-left"></i>
+                                        </button>
+                                        <div>
+                                            <span> {currentPage} / {totalPages} </span>
+                                        </div>
+                                        <button className='btn btn-sm border-0' onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages}>
+                                            <i className="fa-solid fa-chevron-right"></i>
+                                        </button>
+                                        <button className='btn btn-sm border-0' onClick={() => setCurrentPage(totalPages)} disabled={currentPage === totalPages} >
+                                            <i className="fa-solid fa-angles-right"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        ) :
+                            (
+                                <h4 className='text-center my-4'>
+                                    No data found
+                                </h4>
+                            )}
                     </div>
                 </div>
             </div>
@@ -339,23 +304,23 @@ const TaskPage = () => {
                                 Description must be between 10 and 200 characters.
                             </div>
                         </FloatingLabel>
-
-                        <div className="mb-3">
-                            <FloatingLabel label="Due Date" className="mb-3">
-                                <DatePicker
-                                    onChange={handleDate}
-                                    value={formData.due_date}
-                                    className="form-control"
-                                    format="yyyy-MM-dd"
-                                    clearIcon={null}
-                                    calendarIcon="📅"
-                                    required
-                                />
-                                <Form.Control.Feedback type="invalid">Description is required</Form.Control.Feedback>
-                            </FloatingLabel>
-                        </div>
+                        <FloatingLabel label="Due Date" className="mb-3">
+                            <DatePicker
+                                onChange={(date) => setFormData({ ...formData, due_date: toYMD(date) })}
+                                value={formData.due_date}
+                                format="yyyy-MM-dd"
+                                clearIcon={null}
+                                calendarIcon="📅"
+                                style={{ border: "none", outline: "none", boxShadow: "none" }}
+                                className="form-control custom-datepicker"
+                                required
+                            />
+                        </FloatingLabel>
                         <Modal.Footer>
-                            <Button variant="secondary" onClick={() => { addCloseModal(); resetFormData() }} >Close</Button>
+                            <Button variant="secondary" onClick={() => {
+                                addCloseModal(); setFormData(initialFormData);
+                                setValidated(false);
+                            }}>Close</Button>
                             <Button type='submit' variant="primary" >Submit</Button>
                         </Modal.Footer>
                     </Modal.Body>
@@ -366,7 +331,7 @@ const TaskPage = () => {
                 <Modal.Header >
                     <Modal.Title>Modal title</Modal.Title>
                 </Modal.Header>
-                <Form noValidate validated={validated} onSubmit={handleEditSubmit} >
+                <Form noValidate validated={validated} onSubmit={handleUpdate} >
                     <Modal.Body>
 
                         <FloatingLabel label="Title" className="mb-3">
@@ -399,7 +364,7 @@ const TaskPage = () => {
                         <div className="mb-3">
                             <FloatingLabel label="Due Date" className="mb-3">
                                 <DatePicker
-                                    onChange={handleDate}
+                                    onChange={(date) => setFormData({ ...formData, due_date: toYMD(date) })}
                                     value={formData.due_date}
                                     className="form-control"
                                     format="yyyy-MM-dd"
@@ -411,7 +376,10 @@ const TaskPage = () => {
                             </FloatingLabel>
                         </div>
                         <Modal.Footer>
-                            <Button variant="secondary" onClick={() => { editCloseModal(); resetFormData(); }}>Close</Button>
+                            <Button variant="secondary" onClick={() => {
+                                editCloseModal(); setFormData(initialFormData);
+                                setValidated(false);
+                            }}>Close</Button>
                             <Button type='submit' variant="primary">Submit</Button>
                         </Modal.Footer>
                     </Modal.Body>

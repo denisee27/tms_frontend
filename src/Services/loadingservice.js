@@ -8,7 +8,7 @@ export const LoadingProvider = ({ children }) => {
     const done = () => setIsLoading(false);
 
     return (
-        <LoadingContext.Provider value={{ isLoading, start, done }}>
+        <LoadingContext.Provider value={{ isLoading, setIsLoading, start, done }}>
             {children}
         </LoadingContext.Provider>
     );

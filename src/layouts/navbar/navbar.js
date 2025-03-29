@@ -4,6 +4,7 @@ import { useSidebarService } from '../../Services/sidebarservice';
 import { Dropdown, } from 'react-bootstrap';
 import { useLoadingService } from '../../Services/loadingservice';
 import Avatar from '../avatar';
+import Breadcrumb from '../../Services/breadcrump';
 
 const Navbar = () => {
   const { isLoading } = useLoadingService();
@@ -20,7 +21,7 @@ const Navbar = () => {
         </button>
 
         <div className="d-flex align-items-center">
-          <div className="border-end">
+          <div className="border-end mx-0">
             <button className="btn border-0 notif-dropdown position-relative" onClick={() => setShowNotif(!showNotif)}>
               <span className="material-icons fs-3">notifications_none</span>
               {notif.count > 0 && (
@@ -32,9 +33,9 @@ const Navbar = () => {
           </div>
           <Dropdown>
             <Dropdown.Toggle variant="transparent" id="dropdown-basic">
-              <div style={{ borderRadius: "20px" }} className="nav-link dropdown-toggle d-flex align-items-center justify-content-center pb-2 text-primary">
+              <div style={{ borderRadius: "20px" }} className="nav-link dropdown-toggle d-flex align-items-center justify-content-center text-primary">
                 <div className="me-2">
-                  <Avatar userData={{ profile_pic: null, name: 'denise', initials: 'DE' }} height={48} width={48} />
+                  <Avatar userData={{ profile_pic: null, name: 'denise', initials: 'DE' }} height={45} width={45} />
                 </div>
                 <div className="w-75 pe-2">
                   <div className="text-truncate">Denise Aldianto</div>
@@ -46,7 +47,7 @@ const Navbar = () => {
               <Dropdown.Item href="#/action-1">
                 <div className="d-flex align-items-center justify-content-center">
                   <div className="w-25 me-2">
-                    <Avatar userData={{ profile_pic: null, name: 'denise', initials: 'DE' }} height={48} width={48} />
+                    <Avatar userData={{ profile_pic: null, name: 'denise', initials: 'DE' }} height={45} width={45} />
                   </div>
                   <div className="w-75" style={{ fontSize: "15px" }}>
                     <div className="fw-bold text-nowrap text-truncate">Denise Aldianto</div>
@@ -77,6 +78,7 @@ const Navbar = () => {
           </Dropdown>
         </div>
       </div>
+      <Breadcrumb />
     </nav>
   );
 };

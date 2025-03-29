@@ -35,6 +35,17 @@ input[type="search"]::-webkit-search-results-decoration {
   display: none;
 }
 
+.react-date-picker__wrapper {
+  border: none !important;
+  background: none !important;
+}
+
+
+.react-datetime-picker__wrapper {
+  border: none;
+}
+
+
 .required::after {
   content: " *";
   color: red;
@@ -135,13 +146,11 @@ input[type="number"] {
 
 .content-main {
   transition: all 0.3s ease-in-out;
-  /* Gantilah dengan nilai yang sesuai dengan $transition-base */
 }
 
 .loading {
   height: 5px;
   background-color: #007bff;
-  /* Gantilah dengan nilai konkret dari $primary */
   position: fixed;
   top: 0;
   width: 100%;
@@ -173,4 +182,14 @@ input[type="number"] {
 .auth-timeout {
   z-index: 99999;
   backdrop-filter: blur(15px);
+}
+
+.swal2-x-mark-line-right,
+.swal2-x-mark-line-left {
+  font-size: 16px !important;
+}
+
+.swal2-success-line-tip,
+.swal2-success-line-long {
+  font-size: 16px !important;
 }

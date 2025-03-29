@@ -7,21 +7,27 @@ import Layout from "./layouts/layout";
 import { SidebarProvider } from "./Services/sidebarservice";
 import { UtilitiesProvider } from "./Services/utilitiesservice";
 import Brand from "./components/brand/brand";
+import { HttpService } from "./Services/httpservice";
+import { PageQueryProvider } from "./Services/pagequery";
 function App() {
   return (
     <LoadingProvider>
-      <UtilitiesProvider>
-        <SidebarProvider>
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Layout />}>
-                <Route index element={<TaskPage />} />
-                <Route path="brand" element={<Brand />} />
-              </Route>
-            </Routes>
-          </BrowserRouter>
-        </SidebarProvider>
-      </UtilitiesProvider>
+      <HttpService>
+        <UtilitiesProvider>
+          <SidebarProvider>
+            <BrowserRouter>
+              <PageQueryProvider>
+                <Routes>
+                  <Route path="/" element={<Layout />}>
+                    <Route index element={<TaskPage />} />
+                    <Route path="brand" element={<Brand />} />
+                  </Route>
+                </Routes>
+              </PageQueryProvider>
+            </BrowserRouter>
+          </SidebarProvider>
+        </UtilitiesProvider>
+      </HttpService>
     </LoadingProvider>
   );
 }

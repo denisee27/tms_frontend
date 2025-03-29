@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { useLoadingService } from '../../Services/loadingservice';
 import './sidebar.css';
 import { useSidebarService } from '../../Services/sidebarservice';
 
 const Sidebar = () => {
-    const { isLoading } = useLoadingService();
     const [isCollapsed, setIsCollapsed] = useState({});
     const { isOpen } = useSidebarService();
     const location = useLocation();
@@ -83,73 +81,64 @@ const Sidebar = () => {
             <div className="sidebar-heading p-0 text-center">
                 <img src="/logo192.png" alt="Logo" />
             </div>
-            {isLoading && (
-                <div className="d-flex justify-content-center w-100 pe-md-3">
-                    <div className="spinner-border text-primary" role="status">
-                        <span className="visually-hidden">Loading...</span>
-                    </div>
+            <ul className="nav nav-pills flex-column mb-auto mt-1">
+                <div className='nav-item'>
+                    <Link to="/dashboard" className="nav-link px-3 align-middle px-0 d-md-flex align-items-center text-center">
+                        <i className="material-icons">dashboard</i>
+                        Dashboard
+                    </Link>
                 </div>
-            )}
-            {!isLoading && (
-                <ul className="nav nav-pills flex-column mb-auto mt-1">
-                    <div className='nav-item'>
-                        <Link to="/dashboard" className="nav-link px-3 align-middle px-0 d-md-flex align-items-center text-center">
-                            <i className="material-icons">dashboard</i>
-                            Dashboard
-                        </Link>
-                    </div>
-                    {navData.map((nav, i) => (
-                        !nav.parent_id && (
-                            <li key={i} className="nav-item">
-                                {nav.link ? (
-                                    <Link to={`/${nav.link}`} className="nav-link px-3 align-middle px-0 d-md-flex align-items-center text-center">
-                                        <i className="material-icons">{nav.icon}</i>
-                                        {nav.name}
+                {navData.map((nav, i) => (
+                    !nav.parent_id && (
+                        <li key={i} className="nav-item">
+                            {nav.link ? (
+                                <Link to={`/${nav.link}`} className="nav-link px-3 align-middle px-0 d-md-flex align-items-center text-center">
+                                    <i className="material-icons">{nav.icon}</i>
+                                    {nav.name}
+                                    {nav.task_count > 0 && (
+                                        <span className="badge bg-danger ms-2">{nav.task_count < 100 ? nav.task_count : '99+'}</span>
+                                    )}
+                                </Link>
+                            ) : (
+                                <div onClick={() => toggleNav(i)} className={`nav-link px-3 align-middle px-0 d-md-flex align-items-center text-center cursor-pointer child-link ${isCollapsed[i] ? 'a-expanded' : ''}`}>
+                                    <i className="material-icons">{nav.icon}</i>
+                                    <span className="position-relative d-flex justify-content-between w-75">
+                                        <div style={{ fontSize: "16px" }}>{nav.name}</div>
                                         {nav.task_count > 0 && (
-                                            <span className="badge bg-danger ms-2">{nav.task_count < 100 ? nav.task_count : '99+'}</span>
+                                            <span className="mt-2 translate-middle p-1 bg-danger border border-light rounded-circle ms-1">
+                                                <span className="visually-hidden">New alerts</span>
+                                            </span>
                                         )}
-                                    </Link>
-                                ) : (
-                                    <div onClick={() => toggleNav(i)} className={`nav-link px-3 align-middle px-0 d-md-flex align-items-center text-center cursor-pointer child-link ${isCollapsed[i] ? 'a-expanded' : ''}`}>
-                                        <i className="material-icons">{nav.icon}</i>
-                                        <span className="position-relative d-flex justify-content-between w-75">
-                                            <div style={{ fontSize: "16px" }}>{nav.name}</div>
-                                            {nav.task_count > 0 && (
-                                                <span className="mt-2 translate-middle p-1 bg-danger border border-light rounded-circle ms-1">
-                                                    <span className="visually-hidden">New alerts</span>
-                                                </span>
-                                            )}
-                                        </span>
-                                    </div>
-                                )}
-                                {nav.childs?.length > 0 && (
-                                    <ul className={`sub-child ps-3 ${isCollapsed[i] ? 'expanded' : ''}`} data-index={i}>
-                                        {nav.childs.map((child, j) => (
-                                            child.link && (
-                                                <li key={j} className={`nav-item sub-nav border-top rounded ${isActive(child.link) ? 'active' : ''}`}>
-                                                    <Link to={`/${child.link}`} className="nav-link align-middle px-0 d-md-flex align-items-center text-center">
-                                                        <i className="material-icons">{child.icon}</i>
-                                                        {child.name}
-                                                        {child.task_count > 0 && (
-                                                            <span className="badge bg-danger ms-2">{child.task_count < 100 ? child.task_count : '99+'}</span>
-                                                        )}
-                                                    </Link>
-                                                </li>
-                                            )
-                                        ))}
-                                    </ul>
-                                )}
-                            </li>
-                        )
-                    ))}
-                    <li className="nav-item">
-                        <a href="/manual_book.pdf" target="_blank" className="nav-link px-3 align-middle px-0 d-md-flex align-items-center text-center">
-                            <i className="material-icons">help</i>
-                            Help
-                        </a>
-                    </li>
-                </ul>
-            )}
+                                    </span>
+                                </div>
+                            )}
+                            {nav.childs?.length > 0 && (
+                                <ul className={`sub-child ps-3 ${isCollapsed[i] ? 'expanded' : ''}`} data-index={i}>
+                                    {nav.childs.map((child, j) => (
+                                        child.link && (
+                                            <li key={j} className={`nav-item sub-nav border-top rounded ${isActive(child.link) ? 'active' : ''}`}>
+                                                <Link to={`/${child.link}`} className="nav-link align-middle px-0 d-md-flex align-items-center text-center">
+                                                    <i className="material-icons">{child.icon}</i>
+                                                    {child.name}
+                                                    {child.task_count > 0 && (
+                                                        <span className="badge bg-danger ms-2">{child.task_count < 100 ? child.task_count : '99+'}</span>
+                                                    )}
+                                                </Link>
+                                            </li>
+                                        )
+                                    ))}
+                                </ul>
+                            )}
+                        </li>
+                    )
+                ))}
+                <li className="nav-item">
+                    <a href="/manual_book.pdf" target="_blank" className="nav-link px-3 align-middle px-0 d-md-flex align-items-center text-center">
+                        <i className="material-icons">help</i>
+                        Help
+                    </a>
+                </li>
+            </ul>
         </div>
     );
 };
