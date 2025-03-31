@@ -22,7 +22,7 @@ export const PageQueryProvider = ({ children }) => {
             ...newQuery,
         }));
         setIsSearch(newQuery.q || false);
-    }, [location.search]); // ✅ Hanya bergantung pada location.search
+    }, [location.search]);
 
     const changeRoute = (params) => {
         const newParams = new URLSearchParams(params).toString();

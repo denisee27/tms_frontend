@@ -10,7 +10,7 @@ import moment from 'moment';
 import { swalToastSuccess } from '../../Services/alertswal';
 import { toYMD } from '../../Services/dateconvert';
 import { useHttpService } from '../../Services/httpservice';
-// import { usePageQueryService } from '../../Services/pagequery';
+import { usePageQueryService } from '../../Services/pagequery';
 
 const TaskPage = () => {
     const apiUrl = process.env.REACT_APP_API_URL;
@@ -21,25 +21,21 @@ const TaskPage = () => {
     };
     const [formData, setFormData] = useState(initialFormData)
     const { get, destroy, put, post, patch } = useHttpService();
-    // const { queryPage } = usePageQueryService();
+    const { queryPage, setQueryPage } = usePageQueryService();
     const [validated, setValidated] = useState(false);
-    const [datas, setDatas] = useState([]);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
-    const [limit, setLimit] = useState(10);
+    const [datas, setDatas] = useState({});
     const [sortDueDate, setSortDueDate] = useState();
 
     const fetchTasks = useCallback(async () => {
-        const response = await get("tasks");
+        const response = await get("tasks", queryPage);
         if (response?.success) {
-            setDatas(response.response?.data);
-            setTotalPages(response.data?.totalPages || 1);
+            setDatas(response.response);
         }
-    }, [get]);
+    }, [get, queryPage]);
 
     useEffect(() => {
         fetchTasks();
-    }, [fetchTasks]);
+    }, [fetchTasks, queryPage.limit, queryPage.page]);
 
     const handleSubmitDelete = async () => {
         const response = await destroy("tasks/delete/" + formData.id);
@@ -150,7 +146,7 @@ const TaskPage = () => {
                                 </Button>
                             </div>
                         </div>
-                        {datas.length > 0 ? (
+                        {datas?.data?.length > 0 ? (
                             <div className='mt-2'>
                                 <Table className='text-center' hover bordered striped>
                                     <thead>
@@ -180,7 +176,7 @@ const TaskPage = () => {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {datas.map((data, index) => (
+                                        {datas.data.map((data, index) => (
                                             <tr key={data.id}>
                                                 <td>{index + 1} </td>
                                                 <td>{data.title} </td>
@@ -229,9 +225,11 @@ const TaskPage = () => {
                                         <select
                                             className='form-select form-select-sm'
                                             id="limitSelect"
-                                            value={limit}
+                                            value={queryPage.limit}
                                             style={{ height: "30px" }}
-                                            onChange={(e) => setLimit(parseInt(e.target.value))}
+                                            onChange={(e) => {
+                                                setQueryPage((prev) => ({ ...prev, limit: e.target.value, page: 1 }));
+                                            }}
                                         >
                                             <option value="2">2</option>
                                             <option value="5">5</option>
@@ -243,21 +241,38 @@ const TaskPage = () => {
                                         <div className='me-2'>
                                             Total : {datas.length}
                                         </div>
-                                        <button className='btn btn-sm border-0' onClick={() => setCurrentPage(1)} disabled={currentPage === 1} >
+                                        <button
+                                            className='btn btn-sm border-0'
+                                            onClick={() => setQueryPage((prev) => ({ ...prev, page: 1 }))}
+                                            disabled={queryPage.page === 1}>
                                             <i className="fa-solid fa-angles-left"></i>
                                         </button>
-                                        <button className='btn btn-sm border-0' onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} disabled={currentPage === 1} >
+
+                                        <button
+                                            className='btn btn-sm border-0'
+                                            onClick={() => setQueryPage((prev) => ({ ...prev, page: Math.max(prev.page - 1, 1) }))}
+                                            disabled={queryPage.page === 1}>
                                             <i className="fa-solid fa-chevron-left"></i>
                                         </button>
+
                                         <div>
-                                            <span> {currentPage} / {totalPages} </span>
+                                            <span> {queryPage.page} / {datas.totalPages} </span>
                                         </div>
-                                        <button className='btn btn-sm border-0' onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages}>
+
+                                        <button
+                                            className='btn btn-sm border-0'
+                                            onClick={() => setQueryPage((prev) => ({ ...prev, page: Math.min(prev.page + 1, datas.totalPages) }))}
+                                            disabled={queryPage.page === datas.totalPages}>
                                             <i className="fa-solid fa-chevron-right"></i>
                                         </button>
-                                        <button className='btn btn-sm border-0' onClick={() => setCurrentPage(totalPages)} disabled={currentPage === totalPages} >
+
+                                        <button
+                                            className='btn btn-sm border-0'
+                                            onClick={() => setQueryPage((prev) => ({ ...prev, page: datas.totalPages }))}
+                                            disabled={queryPage.page === datas.totalPages}>
                                             <i className="fa-solid fa-angles-right"></i>
                                         </button>
+
                                     </div>
                                 </div>
                             </div>
