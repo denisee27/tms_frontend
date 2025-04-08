@@ -1,177 +1,97 @@
-// import axios from "axios";
-// import { createBrowserHistory } from "history";
-// import EncryptService from "./EncryptService";
+import React, { createContext, useContext, useState } from "react";
+import axios from "axios";
+import { EncryptService } from "./encrypt";
+import { environment } from "../environtments/environtment";
+import { useLoadingService } from "./loadingservice";
 
-// const history = createBrowserHistory();
-// const API_URL = process.env.REACT_APP_API_URL || "https://your-api-url.com";
+const AuthContext = createContext();
 
-// class AuthService {
-//     constructor() {
-//         this.loading = new LoadingService();
-//         this.timeout = null;
-//     }
+export const AuthProvider = ({ children }) => {
+    const { loadingstart, loadingdone } = useLoadingService();
+    const [user, setUser] = useState(null);
 
-//     getAuthData() {
-//         const cookie = localStorage.getItem("_yourApp.globals");
-//         if (!cookie) return null;
-//         try {
-//             return JSON.parse(EncryptService.decrypt(cookie));
-//         } catch (e) {
-//             return null;
-//         }
-//     }
+    const apiUrl = environment.apiUrl;
+    const httpOptions = {
+        headers: { Accept: "application/json" },
+    };
 
-//     isLoggedIn() {
-//         const authData = this.getAuthData();
-//         return authData?.token_type && authData?.user?.email ? true : false;
-//     }
+    const cekAuth = () => {
+        const cookie = localStorage.getItem(`_${environment.appName}.globals`);
+        if (!cookie) return null;
+        try {
+            return JSON.parse(EncryptService.decrypt(cookie));
+        } catch {
+            return null;
+        }
+    };
 
-//     async reload() {
-//         this.loading.start();
-//         const authData = this.getAuthData() || {};
-//         try {
-//             const response = await axios.get(`${API_URL}/auth/profile`, {
-//                 headers: { Authorization: `${authData.token_type} ${authData.access_token}` },
-//             });
-//             this.userData = response.data.result;
-//         } catch (error) {
-//             console.error("Failed to reload user data", error);
-//         } finally {
-//             this.loading.done();
-//         }
-//     }
+    const isLoggedIn = () => {
+        const authData = cekAuth();
+        if (!authData) return false;
+        if (!authData.token_type) return false
+        if (authData.user && authData.user.email) {
+            return true
+        } else {
+            return false
+        }
 
-//     async login(email, password, keepLogin = false) {
-//         this.loading.start();
-//         try {
-//             const formData = new FormData();
-//             formData.append("email", email);
-//             formData.append("password", password);
-//             if (keepLogin) formData.append("keepLogin", "true");
+    };
 
-//             const response = await axios.post(`${API_URL}/auth/login`, formData);
-//             this.saveAuth(response.data.result);
-//             return { success: true };
-//         } catch (error) {
-//             return { success: false, response: error.response?.data };
-//         } finally {
-//             this.loading.done();
-//         }
-//     }
+    const saveAuth = (authData) => {
+        const date = new Date();
+        date.setSeconds(date.getSeconds() + authData.timeout);
+        authData.expires = date.getTime();
+        const encAuth = EncryptService.encrypt(JSON.stringify(authData));
+        localStorage.setItem(`_${environment.appName}.globals`, encAuth);
+    };
 
-//     async loginByToken(token) {
-//         this.loading.start();
-//         try {
-//             const response = await axios.get(`${API_URL}/auth/profile?token=${token}`);
-//             const authData = {
-//                 token_type: "Bearer",
-//                 access_token: token,
-//                 timeout: 432000,
-//                 user: response.data.result,
-//             };
-//             this.saveAuth(authData);
-//             return { success: true };
-//         } catch (error) {
-//             return { success: false, response: error.response?.data };
-//         } finally {
-//             this.loading.done();
-//         }
-//     }
+    const login = async (email, password) => {
+        loadingstart();
+        const data = new FormData();
+        data.append("email", email);
+        data.append("password", password);
+        try {
+            const res = await axios.post(`${apiUrl}/auth/login`, data, httpOptions);
+            saveAuth(res.data.result);
+            setUser(res.data.result);
+            return { success: true };
+        } catch (err) {
+            return { success: false, response: err.response?.data?.message || "Error" };
+        } finally {
+            loadingdone();
+        }
+    };
 
-//     async signUp(data) {
-//         this.loading.start();
-//         try {
-//             await axios.post(`${API_URL}/auth/login`, data);
-//             return { success: true };
-//         } catch (error) {
-//             return { success: false, response: error.response?.data };
-//         } finally {
-//             this.loading.done();
-//         }
-//     }
+    const logout = async (navigate) => {
+        loadingstart();
+        const authData = cekAuth();
+        try {
+            await axios.get(`${apiUrl}/auth/logout`, {
+                headers: {
+                    ...httpOptions.headers,
+                    Authorization: `${authData.token_type} ${authData.access_token}`,
+                },
+            });
+        } catch { return true } finally {
+            localStorage.removeItem(`_${environment.appName}.globals`);
+            setUser(null);
+            navigate('/login');
+            loadingdone();
+        }
+    };
 
-//     logout(noRedirect = false, direct = false) {
-//         clearTimeout(this.timeout);
-//         if (direct) {
-//             localStorage.removeItem("_yourApp.globals");
-//             return;
-//         }
+    // useEffect(() => {
+    //     if (isLoggedIn()) {
+    //         const authData = cekAuth();
+    //         setUser(authData.user);
+    //     }
+    // }, [isLoggedIn]);
 
-//         this.loading.start();
-//         const authData = this.getAuthData() || {};
-//         axios
-//             .get(`${API_URL}/auth/logout`, {
-//                 headers: { Authorization: `${authData.token_type} ${authData.access_token}` },
-//             })
-//             .finally(() => {
-//                 localStorage.removeItem("_yourApp.globals");
-//                 if (!noRedirect) {
-//                     history.push("/login");
-//                 }
-//                 this.loading.done();
-//             });
-//     }
+    return (
+        <AuthContext.Provider value={{ user, login, logout, isLoggedIn }}>
+            {children}
+        </AuthContext.Provider>
+    );
+};
 
-//     get userData() {
-//         if (!this.isLoggedIn()) return null;
-//         return this.getAuthData()?.user;
-//     }
-
-//     set userData(userData) {
-//         const authData = this.getAuthData();
-//         if (authData) {
-//             authData.user = userData;
-//             localStorage.setItem("_yourApp.globals", EncryptService.encrypt(JSON.stringify(authData)));
-//         }
-//     }
-
-//     get tokenData() {
-//         if (!this.isLoggedIn()) return null;
-//         const authData = this.getAuthData();
-//         delete authData.user;
-//         return authData;
-//     }
-
-//     set tokenData(tokenData) {
-//         const authData = this.getAuthData();
-//         if (!authData) return;
-//         authData.user = tokenData?.user || authData.user;
-//         localStorage.setItem("_yourApp.globals", EncryptService.encrypt(JSON.stringify(authData)));
-//     }
-
-//     saveAuth(authData) {
-//         const date = new Date();
-//         date.setSeconds(date.getSeconds() + authData.timeout);
-//         authData.expires = date.getTime();
-//         localStorage.setItem("_yourApp.globals", EncryptService.encrypt(JSON.stringify(authData)));
-//         this.refreshTimeout(authData);
-//     }
-
-//     checkTimeout() {
-//         const authData = this.tokenData;
-//         if (!authData) return true;
-
-//         const currentTime = Date.now();
-//         if (currentTime > authData.expires) {
-//             return true;
-//         }
-//         return false;
-//     }
-
-//     refreshTimeout(tokenData) {
-//         clearTimeout(this.timeout);
-//         const authData = tokenData || this.tokenData;
-//         if (!authData) return;
-
-//         const date = new Date();
-//         date.setSeconds(date.getSeconds() + authData.timeout);
-//         authData.expires = date.getTime();
-//         this.tokenData = authData;
-
-//         this.timeout = setTimeout(() => {
-//             console.log("Session expired");
-//         }, authData.timeout * 1000);
-//     }
-// }
-
-// export default new AuthService();
+export const useAuthService = () => useContext(AuthContext);

@@ -2,13 +2,14 @@ import React, { createContext, useCallback, useContext } from 'react';
 import axios from 'axios';
 import { swalToastError } from './alertswal';
 import { useLoadingService } from './loadingservice';
+import { environment } from '../environtments/environtment';
 
 const HttpContext = createContext();
 
 export const HttpService = ({ children }) => {
     const { setIsLoading } = useLoadingService();
     // const { logout } = useAuthService();
-    const apiUrl = process.env.REACT_APP_API_URL;
+    const apiUrl = environment.apiUrl;
 
     const handleError = (err) => {
         let errDescription = '';
@@ -81,7 +82,7 @@ export const HttpService = ({ children }) => {
     const patch = async (urlPath, data = {}, noLoading = false) => {
         if (!noLoading) setIsLoading(true);
         try {
-            const response = await axios.put(`${apiUrl}/${urlPath}`, data, {
+            const response = await axios.patch(`${apiUrl}/${urlPath}`, data, {
                 headers: { 'Content-Type': 'application/json' }
             });
             return { success: true, response: response.data };

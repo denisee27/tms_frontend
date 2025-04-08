@@ -13,7 +13,7 @@ import { useHttpService } from '../../Services/httpservice';
 import { usePageQueryService } from '../../Services/pagequery';
 
 const TaskPage = () => {
-    const apiUrl = process.env.REACT_APP_API_URL;
+    const apiUrl = 'tasks';
     const initialFormData = {
         title: "",
         description: "",
@@ -27,11 +27,11 @@ const TaskPage = () => {
     const [sortDueDate, setSortDueDate] = useState();
 
     const fetchTasks = useCallback(async () => {
-        const response = await get("tasks", queryPage);
+        const response = await get("tasks", { ...queryPage, sortDueDate: sortDueDate });
         if (response?.success) {
             setDatas(response.response);
         }
-    }, [get, queryPage]);
+    }, [get, queryPage, sortDueDate]);
 
     useEffect(() => {
         fetchTasks();
@@ -60,7 +60,7 @@ const TaskPage = () => {
             ...formData,
             due_date: toYMD(formData.due_date),
         };
-        const response = await put(`tasks/update/${formData.id}`, formValues);
+        const response = await put(`${apiUrl}/update/${formData.id}`, formValues);
         if (response.success) {
             swalToastSuccess(`Update Task Success`);
         }
@@ -82,7 +82,7 @@ const TaskPage = () => {
             ...formData,
             due_date: toYMD(formData.due_date),
         };
-        const response = await post(`tasks/create`, formValues);
+        const response = await post(`${apiUrl}/create`, formValues);
         if (response.success) {
             swalToastSuccess(`Create Task Success`);
         }
@@ -93,7 +93,7 @@ const TaskPage = () => {
     };
 
     const handleSwitchTask = async (id, status) => {
-        const response = await patch(`${apiUrl}/tasks/mark/${id}`, { status: !status });
+        const response = await patch(`${apiUrl}/mark/${id}`, { status: !status });
         if (response.success) {
             swalToastSuccess(`Marked as completed Update to ${!status ? 'Completed' : 'Pending'}`);
         }
@@ -286,7 +286,7 @@ const TaskPage = () => {
                 </div>
             </div>
 
-            <Modal show={addshow} onHide={addCloseModal} backdrop="static" keyboard={false}>
+        <Modal show={addshow} onHide={addCloseModal} backdrop="static" keyboard={false}>
                 <Modal.Header >
                     <Modal.Title>Modal title</Modal.Title>
                 </Modal.Header>

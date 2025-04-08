@@ -10,6 +10,7 @@ import Brand from "./components/brand/brand";
 import { HttpService } from "./Services/httpservice";
 import { PageQueryProvider } from "./Services/pagequery";
 import Login from "./components/login/login";
+import { AuthProvider } from "./Services/authservice";
 function App() {
   return (
     <LoadingProvider>
@@ -17,15 +18,17 @@ function App() {
         <UtilitiesProvider>
           <SidebarProvider>
             <BrowserRouter>
-              <PageQueryProvider>
-                <Routes>
-                  <Route path="login" element={<Login />} />
-                  <Route path="/" element={<Layout />}>
-                    <Route index element={<TaskPage />} />
-                    <Route path="brand" element={<Brand />} />
-                  </Route>
-                </Routes>
-              </PageQueryProvider>
+              <AuthProvider>
+                <PageQueryProvider>
+                  <Routes>
+                    <Route path="login" element={<Login />} />
+                    <Route path="/" element={<Layout />}>
+                      <Route index element={<TaskPage />} />
+                      <Route path="brand" element={<Brand />} />
+                    </Route>
+                  </Routes>
+                </PageQueryProvider>
+              </AuthProvider>
             </BrowserRouter>
           </SidebarProvider>
         </UtilitiesProvider>

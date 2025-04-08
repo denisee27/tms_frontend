@@ -1,15 +1,19 @@
 import React, { useState } from "react";
+import { useLoadingService } from "../../Services/loadingservice";
+import { useAuthService } from "../../Services/authservice";
+import { swalToastError } from "../../Services/alertswal";
 
 const Login = () => {
     const [form, setForm] = useState({ email: "", password: "" });
     const [errors, setErrors] = useState({});
     const [isShowPassword, setIsShowPassword] = useState(false);
-    const [loading, setLoading] = useState(false);
+    const { loading, loadingstart, loadingdone } = useLoadingService();
+    const { login } = useAuthService();
 
     const validateForm = () => {
         let newErrors = {};
         if (!form.email) {
-            newErrors.email = "Type Nip";
+            newErrors.email = "Type Email";
         } else if (!/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(form.email)) {
             newErrors.email = "Email isn't valid";
         }
@@ -27,10 +31,16 @@ const Login = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         if (validateForm()) {
-            setLoading(true);
-            // Submit logic here
-            console.log("Form submitted", form);
-            setLoading(false);
+            loadingstart();
+            login(form.email, form.password)
+                .then((res) => {
+                    if (res.success) {
+                        // window.location.href = "/";
+                    } else {
+                        swalToastError(res.response);
+                    }
+                })
+            loadingdone();
         }
     };
 
@@ -45,7 +55,7 @@ const Login = () => {
                             </div>
                             <div>
                                 <h2 className="fw-bold pt-3">TMS Login</h2>
-                                <p className="text-muted fw-bold">Type your NIP &amp; Password.</p>
+                                <p className="text-muted fw-bold">Type your Email &amp; Password.</p>
                             </div>
                         </div>
                         <form className="p-3 col-12" onSubmit={handleSubmit} noValidate>
@@ -59,7 +69,7 @@ const Login = () => {
                                     placeholder="name@example.com"
                                     required
                                 />
-                                <label>NIP</label>
+                                <label>Email</label>
                                 {errors.email && <div className="text-danger position-absolute text-end w-100 small">{errors.email}</div>}
                             </div>
 
