@@ -1,19 +1,20 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useCallback, useContext, useMemo, useState } from "react";
 import axios from "axios";
 import { EncryptService } from "./encrypt";
 import { environment } from "../environtments/environtment";
 import { useLoadingService } from "./loadingservice";
+import { useNavigate } from "react-router-dom";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
     const { loadingstart, loadingdone } = useLoadingService();
     const [user, setUser] = useState(null);
-
     const apiUrl = environment.apiUrl;
-    const httpOptions = {
+    const navigate = useNavigate();
+    const httpOptions = useMemo(() => ({
         headers: { Accept: "application/json" },
-    };
+    }), []);
 
     const cekAuth = () => {
         const cookie = localStorage.getItem(`_${environment.appName}.globals`);
@@ -56,13 +57,13 @@ export const AuthProvider = ({ children }) => {
             setUser(res.data.result);
             return { success: true };
         } catch (err) {
-            return { success: false, response: err.response?.data?.message || "Error" };
+            return { success: false, response: err.response?.data || "Error" };
         } finally {
             loadingdone();
         }
     };
 
-    const logout = async (navigate) => {
+    const logout = useCallback(async () => {
         loadingstart();
         const authData = cekAuth();
         try {
@@ -78,7 +79,7 @@ export const AuthProvider = ({ children }) => {
             navigate('/login');
             loadingdone();
         }
-    };
+    }, [apiUrl, httpOptions, loadingstart, loadingdone, navigate]);
 
     // useEffect(() => {
     //     if (isLoggedIn()) {

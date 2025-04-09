@@ -4,6 +4,7 @@ const breadcrumbRoutes = {
     "/": "Beranda",
     "/task": "Task List",
     "/brand": "Brand List",
+    "/login": "Brand List",
 };
 
 const Breadcrumb = () => {

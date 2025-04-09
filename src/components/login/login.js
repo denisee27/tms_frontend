@@ -2,13 +2,15 @@ import React, { useState } from "react";
 import { useLoadingService } from "../../Services/loadingservice";
 import { useAuthService } from "../../Services/authservice";
 import { swalToastError } from "../../Services/alertswal";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
-    const [form, setForm] = useState({ email: "", password: "" });
+    const [form, setForm] = useState({ email: null, password: null });
     const [errors, setErrors] = useState({});
     const [isShowPassword, setIsShowPassword] = useState(false);
     const { loading, loadingstart, loadingdone } = useLoadingService();
     const { login } = useAuthService();
+    const navigate = useNavigate();
 
     const validateForm = () => {
         let newErrors = {};
@@ -35,8 +37,21 @@ const Login = () => {
             login(form.email, form.password)
                 .then((res) => {
                     if (res.success) {
-                        // window.location.href = "/";
+                        navigate('/')
                     } else {
+                        if (res.response && res.response.wrong) {
+                            console.log(res)
+                            const newErrors = {};
+                            Object.keys(res.response.wrong).forEach((key) => {
+                                console.log(key)
+                                newErrors[key] = res.response.wrong[key];
+                                const inputEl = document.querySelector(`[name="${key}"]`);
+                                if (inputEl) inputEl.focus();
+                            });
+                            console.log(newErrors)
+                            setErrors(newErrors);
+                            return
+                        }
                         swalToastError(res.response);
                     }
                 })

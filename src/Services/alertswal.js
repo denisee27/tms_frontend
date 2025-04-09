@@ -40,7 +40,7 @@ export const swalToastError = (error) => {
     Toast.fire({
         icon: "error",
         iconColor: "white",
-        text: error.response ? error?.response?.data?.message : 'No Internet Connection',
-        title: error.message
+        text: error.message ?? 'Unknown Error',
+
     });
 };

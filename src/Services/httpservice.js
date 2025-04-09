@@ -3,21 +3,22 @@ import axios from 'axios';
 import { swalToastError } from './alertswal';
 import { useLoadingService } from './loadingservice';
 import { environment } from '../environtments/environtment';
+import { useAuthService } from './authservice';
 
 const HttpContext = createContext();
 
 export const HttpService = ({ children }) => {
     const { setIsLoading } = useLoadingService();
-    // const { logout } = useAuthService();
+    const { logout } = useAuthService();
     const apiUrl = environment.apiUrl;
 
-    const handleError = (err) => {
+    const handleError = useCallback(async (err) => {
         let errDescription = '';
         if (err.response) {
             const { status, data } = err.response;
             if (status === 401) {
                 errDescription = 'Authorization invalid, please re-login';
-                // logout();
+                logout();
             } else if (status === 0) {
                 errDescription = 'No Internet connection, please check your connection & try again later';
             } else if (status === 500) {
@@ -26,13 +27,13 @@ export const HttpService = ({ children }) => {
                 errDescription = data?.wrong ? Object.values(data.wrong).join('<br>') : (data?.message || 'Unknown Error');
             }
             if (status === 423) {
-                // logout();
+                logout();
             }
         } else {
             errDescription = 'Unknown Error';
         }
         swalToastError(errDescription, { autoClose: 3000 });
-    };
+    }, [logout]);
 
     const get = useCallback(async (urlPath, params = {}, noLoading = false) => {
         if (!noLoading) setIsLoading(true);
@@ -47,7 +48,7 @@ export const HttpService = ({ children }) => {
         } finally {
             if (!noLoading) setIsLoading(false);
         }
-    }, [apiUrl, setIsLoading]);
+    }, [apiUrl, setIsLoading, handleError]);
 
     const post = async (urlPath, data = {}, noLoading = false) => {
         if (!noLoading) setIsLoading(true);

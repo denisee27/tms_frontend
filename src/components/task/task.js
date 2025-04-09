@@ -286,7 +286,7 @@ const TaskPage = () => {
                 </div>
             </div>
 
-        <Modal show={addshow} onHide={addCloseModal} backdrop="static" keyboard={false}>
+            <Modal show={addshow} onHide={addCloseModal} backdrop="static" keyboard={false} centered>
                 <Modal.Header >
                     <Modal.Title>Modal title</Modal.Title>
                 </Modal.Header>
@@ -342,7 +342,7 @@ const TaskPage = () => {
                 </Form>
             </Modal>
 
-            <Modal show={editShow} onHide={editCloseModal} backdrop="static" keyboard={false}>
+            <Modal show={editShow} onHide={editCloseModal} backdrop="static" keyboard={false} centered>
                 <Modal.Header >
                     <Modal.Title>Modal title</Modal.Title>
                 </Modal.Header>
@@ -405,7 +405,8 @@ const TaskPage = () => {
                 show={deleteshow}
                 onHide={deleteCloseModal}
                 backdrop="static"
-                keyboard={false}>
+                keyboard={false}
+                centered>
                 <Modal.Header>
                     <Modal.Title>Delete Data</Modal.Title>
                 </Modal.Header>

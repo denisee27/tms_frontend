@@ -14,11 +14,11 @@ import { AuthProvider } from "./Services/authservice";
 function App() {
   return (
     <LoadingProvider>
-      <HttpService>
-        <UtilitiesProvider>
-          <SidebarProvider>
-            <BrowserRouter>
-              <AuthProvider>
+      <BrowserRouter>
+        <AuthProvider>
+          <HttpService>
+            <UtilitiesProvider>
+              <SidebarProvider>
                 <PageQueryProvider>
                   <Routes>
                     <Route path="login" element={<Login />} />
@@ -28,11 +28,11 @@ function App() {
                     </Route>
                   </Routes>
                 </PageQueryProvider>
-              </AuthProvider>
-            </BrowserRouter>
-          </SidebarProvider>
-        </UtilitiesProvider>
-      </HttpService>
+              </SidebarProvider>
+            </UtilitiesProvider>
+          </HttpService>
+        </AuthProvider>
+      </BrowserRouter>
     </LoadingProvider>
   );
 }
