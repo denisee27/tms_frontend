@@ -33,14 +33,12 @@ const Login = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         if (validateForm()) {
-            loadingstart();
             login(form.email, form.password)
                 .then((res) => {
                     if (res.success) {
                         navigate('/')
                     } else {
                         if (res.response && res.response.wrong) {
-                            console.log(res)
                             const newErrors = {};
                             Object.keys(res.response.wrong).forEach((key) => {
                                 console.log(key)
@@ -48,14 +46,12 @@ const Login = () => {
                                 const inputEl = document.querySelector(`[name="${key}"]`);
                                 if (inputEl) inputEl.focus();
                             });
-                            console.log(newErrors)
                             setErrors(newErrors);
                             return
                         }
                         swalToastError(res.response);
                     }
                 })
-            loadingdone();
         }
     };
 
@@ -69,7 +65,7 @@ const Login = () => {
                                 <img src="/logo192.png" width={'80px'} alt="icon" />
                             </div>
                             <div>
-                                <h2 className="fw-bold pt-3">TMS Login</h2>
+                                <h2 className="fw-bold pt-3">TMS Login {loading ? 'true' : 'false'}</h2>
                                 <p className="text-muted fw-bold">Type your Email &amp; Password.</p>
                             </div>
                         </div>

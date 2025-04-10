@@ -11,6 +11,7 @@ import { HttpService } from "./Services/httpservice";
 import { PageQueryProvider } from "./Services/pagequery";
 import Login from "./components/login/login";
 import { AuthProvider } from "./Services/authservice";
+import { AfterLoginGuard, BeforeLoginGuard } from "./Services/guad";
 function App() {
   return (
     <LoadingProvider>
@@ -21,10 +22,22 @@ function App() {
               <SidebarProvider>
                 <PageQueryProvider>
                   <Routes>
-                    <Route path="login" element={<Login />} />
-                    <Route path="/" element={<Layout />}>
-                      <Route index element={<TaskPage />} />
-                      <Route path="brand" element={<Brand />} />
+                    <Route path="login" element={
+                      <BeforeLoginGuard>
+                        <Login />
+                      </BeforeLoginGuard>
+                    } />
+                    <Route path="/" element={
+                      <AfterLoginGuard>
+                        <Layout />
+                      </AfterLoginGuard>
+                    }>
+                      <Route index element={
+                        <AfterLoginGuard>
+                          <TaskPage />
+                        </AfterLoginGuard>
+                      } />
+                      <Route path="categories" element={<Brand />} />
                     </Route>
                   </Routes>
                 </PageQueryProvider>
