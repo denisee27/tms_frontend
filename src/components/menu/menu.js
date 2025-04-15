@@ -11,7 +11,8 @@ import { toYMD } from '../../services/dateconvert';
 import { useHttpService } from '../../services/httpservice';
 import { usePageQueryService } from '../../services/pagequery';
 
-const TaskPage = () => {
+
+function Menu() {
     const apiUrl = 'tasks';
     const initialFormData = {
         title: "",
@@ -23,20 +24,18 @@ const TaskPage = () => {
     const { queryPage, setQueryPage } = usePageQueryService();
     const [validated, setValidated] = useState(false);
     const [datas, setDatas] = useState({});
-    const [sortDueDate, setSortDueDate] = useState();
+    const [sortDueDate] = useState();
 
-    const fetchTasks = async () => {
+    const fetchTasks = useCallback(async () => {
         const response = await get("tasks", { ...queryPage, sortDueDate: sortDueDate });
         if (response?.success) {
             setDatas(response.response);
         }
-    };
-
+    }, [get, queryPage, sortDueDate]);
 
     useEffect(() => {
         fetchTasks();
-    }, [queryPage.limit, queryPage.page]);
-
+    }, [fetchTasks, queryPage.limit, queryPage.page]);
 
     const handleSubmitDelete = async () => {
         const response = await destroy("tasks/delete/" + formData.id);
@@ -131,7 +130,6 @@ const TaskPage = () => {
             id: data.id,
         });
     };
-
     return (
         <>
             <div className='row'>
@@ -140,7 +138,7 @@ const TaskPage = () => {
                         <div className="card-body">
                             <div className='row my-2'>
                                 <div className='col-md-6 col-sm-12 d-md-flex align-items-center'>
-                                    <h4 className='card-title'>Task Management System</h4>
+                                    <h4 className='card-title'>Menu</h4>
                                 </div>
                                 <div className='col-md-6 col-sm-12 d-flex justify-content-end'>
                                     <div className='text-end'>
@@ -154,85 +152,70 @@ const TaskPage = () => {
                                 </div>
                             </div>
                             {datas?.data?.length > 0 ? (
-                                <>
-                                    <div className='table-responsive'>
-                                        <Table className='text-center' hover bordered striped>
-                                            <thead>
-                                                <tr>
-                                                    <th style={{ width: "5%" }}>No</th>
-                                                    <th>Title</th>
-                                                    <th>Description</th>
-                                                    <th>
-                                                        <div className='d-flex justify-content-center'>
-                                                            Due Date
-                                                            <div className='ms-2'>
-                                                                <div onClick={() => setSortDueDate(sortDueDate === null ? 'ASC' : sortDueDate === 'ASC' ? 'DESC' : null)} style={{ cursor: 'pointer' }}>
-                                                                    {sortDueDate === 'DESC' ? (
-                                                                        <i className="fa-solid fa-sort-down"></i>
-                                                                    ) : sortDueDate === 'ASC' ? (
-                                                                        <i className="fa-solid fa-sort-up"></i>
-                                                                    ) : (
-                                                                        <i className="fa-solid fa-sort"></i>
-                                                                    )}
-                                                                </div>
-                                                            </div>
+                                <div className='table-responsive'>
+                                    <Table className='text-center' hover bordered striped>
+                                        <thead>
+                                            <tr>
+                                                <th style={{ width: "5%" }}>No</th>
+                                                <th>Parent</th>
+                                                <th>Menu</th>
+                                                <th>Link</th>
+                                                <th>Position</th>
+                                                <th>Status</th>
+                                                <th>Created At</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {datas.data.map((data, index) => (
+                                                <tr key={data.id}>
+                                                    <td>{index + 1} </td>
+                                                    <td>{data.title} </td>
+                                                    <td>{data.title} </td>
+                                                    <td>{data.description}</td>
+                                                    <td>{moment(data.due_date).format('DD MMMM YYYY')}</td>
+                                                    <td>
+                                                        <div className="d-flex justify-content-center">
+                                                            <Form.Check type="switch" checked={data.status === true} onChange={() => handleSwitchTask(data.id, data.status)} />
+                                                            {data.status === true ? (
+                                                                <span className='text-light badge bg-success'>
+                                                                    Compeleted
+                                                                </span>
+                                                            ) : (
+                                                                <span className='text-light badge bg-warning'>
+                                                                    Pending
+                                                                </span>
+                                                            )}
                                                         </div>
-                                                    </th>
-                                                    <th>Progress</th>
-                                                    <th>Created At</th>
-                                                    <th>Action</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {datas.data.map((data, index) => (
-                                                    <tr key={data.id}>
-                                                        <td>{index + 1} </td>
-                                                        <td>{data.title} </td>
-                                                        <td>{data.description}</td>
-                                                        <td>{moment(data.due_date).format('DD MMMM YYYY')}</td>
-                                                        <td>
-                                                            <div className="d-flex justify-content-center">
-                                                                <Form.Check type="switch" checked={data.status === true} onChange={() => handleSwitchTask(data.id, data.status)} />
-                                                                {data.status === true ? (
-                                                                    <span className='text-light badge bg-success'>
-                                                                        Compeleted
-                                                                    </span>
-                                                                ) : (
-                                                                    <span className='text-light badge bg-warning'>
-                                                                        Pending
-                                                                    </span>
-                                                                )}
-                                                            </div>
-                                                        </td>
-                                                        <td>{moment(data.createdAt).format('D MMMM YYYY - hh:mm')} </td>
-                                                        <td>
-                                                            <Dropdown>
-                                                                <Dropdown.Toggle variant="outline-primary" >
-                                                                    Action
-                                                                </Dropdown.Toggle>
+                                                    </td>
+                                                    <td>{moment(data.createdAt).format('D MMMM YYYY - hh:mm')} </td>
+                                                    <td>
+                                                        <Dropdown>
+                                                            <Dropdown.Toggle variant="outline-primary" >
+                                                                Action
+                                                            </Dropdown.Toggle>
 
-                                                                <Dropdown.Menu>
-                                                                    <Dropdown.Item href="#/action-1" onClick={() => handleEdit(data)}>
-                                                                        <i className="fa-solid fa-pen me-2"></i>
-                                                                        Edit
-                                                                    </Dropdown.Item>
-                                                                    <Dropdown.Item onClick={() => handleDelete(data)} className='text-danger'>
-                                                                        <i className="fa-solid fa-trash-can me-2"></i>
-                                                                        Delete
-                                                                    </Dropdown.Item>
-                                                                </Dropdown.Menu>
-                                                            </Dropdown>
-                                                        </td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </Table>
-                                    </div>
-                                    <div className='d-flex justify-content-between pb-1 row small'>
-                                        <div className='col-md-3 flex-nowrap d-flex small align-items-center row justify-content-center justify-content-md-start'>
-                                            <label className='col-3 d-flex align-items-center'>Limit : </label>
+                                                            <Dropdown.Menu>
+                                                                <Dropdown.Item href="#/action-1" onClick={() => handleEdit(data)}>
+                                                                    <i className="fa-solid fa-pen me-2"></i>
+                                                                    Edit
+                                                                </Dropdown.Item>
+                                                                <Dropdown.Item onClick={() => handleDelete(data)} className='text-danger'>
+                                                                    <i className="fa-solid fa-trash-can me-2"></i>
+                                                                    Delete
+                                                                </Dropdown.Item>
+                                                            </Dropdown.Menu>
+                                                        </Dropdown>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </Table>
+                                    <div className='d-flex justify-content-between'>
+                                        <div className='flex-nowrap d-flex small align-items-center'>
+                                            <label className='me-2'>Limit: </label>
                                             <select
-                                                className='form-select form-select-sm col-6 w-25'
+                                                className='form-select form-select-sm'
                                                 id="limitSelect"
                                                 value={queryPage.limit}
                                                 style={{ height: "30px" }}
@@ -246,7 +229,7 @@ const TaskPage = () => {
                                                 <option value="20">20</option>
                                             </select>
                                         </div>
-                                        <div className='col-md-4 d-flex align-items-center flex-nowrap justify-content-center justify-content-md-end'>
+                                        <div className='d-flex align-items-center'>
                                             <div className='me-2'>
                                                 Total : {datas.length}
                                             </div>
@@ -284,7 +267,7 @@ const TaskPage = () => {
 
                                         </div>
                                     </div>
-                                </>
+                                </div>
                             ) :
                                 (
                                     <h4 className='text-center my-4'>
@@ -429,8 +412,7 @@ const TaskPage = () => {
                 </Modal.Footer>
             </Modal>
         </>
+    )
+}
 
-    );
-};
-
-export default TaskPage;
+export default Menu

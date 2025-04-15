@@ -1,5 +1,5 @@
 import React from "react";
-import { useUtilitiesService } from "../Services/utilitiesservice";
+import { useUtilitiesService } from "../services/utilitiesservice";
 
 const Avatar = ({ userData = {}, height = 32, width = 32 }) => {
     const { generateColor, getBWColor } = useUtilitiesService();

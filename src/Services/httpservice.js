@@ -1,14 +1,17 @@
 import React, { createContext, useCallback, useContext } from 'react';
-import axios from 'axios';
-import { swalToastError } from './alertswal';
-import { useLoadingService } from './loadingservice';
+
+
 import { environment } from '../environtments/environtment';
+import { useLoadingService } from './loadingservice';
 import { useAuthService } from './authservice';
+import { swalToastError } from './alertswal';
+import { useInterceptor } from './interceptors';
 
 const HttpContext = createContext();
 
 export const HttpService = ({ children }) => {
     const { setIsLoading } = useLoadingService();
+    const { axios } = useInterceptor();
     const { logout } = useAuthService();
     const apiUrl = environment.apiUrl;
 
@@ -48,7 +51,7 @@ export const HttpService = ({ children }) => {
         } finally {
             if (!noLoading) setIsLoading(false);
         }
-    }, [apiUrl, setIsLoading, handleError]);
+    }, [apiUrl, setIsLoading, handleError, axios]);
 
     const post = async (urlPath, data = {}, noLoading = false) => {
         if (!noLoading) setIsLoading(true);

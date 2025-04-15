@@ -2,8 +2,8 @@ import React, { createContext, useCallback, useContext, useMemo, useState } from
 import axios from "axios";
 import { EncryptService } from "./encrypt";
 import { environment } from "../environtments/environtment";
-import { useLoadingService } from "./loadingservice";
 import { useNavigate } from "react-router-dom";
+import { useLoadingService } from "./loadingservice";
 
 const AuthContext = createContext();
 
@@ -35,7 +35,6 @@ export const AuthProvider = ({ children }) => {
         } else {
             return false
         }
-
     };
 
     const saveAuth = (authData) => {
@@ -89,7 +88,7 @@ export const AuthProvider = ({ children }) => {
     // }, [isLoggedIn]);
 
     return (
-        <AuthContext.Provider value={{ user, login, logout, isLoggedIn }}>
+        <AuthContext.Provider value={{ user, cekAuth, login, logout, isLoggedIn }}>
             {children}
         </AuthContext.Provider>
     );

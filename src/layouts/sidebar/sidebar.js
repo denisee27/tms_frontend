@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import './sidebar.css';
-import { useSidebarService } from '../../Services/sidebarservice';
+import { useSidebarService } from '../../services/sidebarservice';
 
 const Sidebar = () => {
     const [isCollapsed, setIsCollapsed] = useState({});
@@ -68,14 +68,6 @@ const Sidebar = () => {
 
     const isActive = (link) => location.pathname === `/${link}`;
 
-    useEffect(() => {
-        const handleResize = () => {
-            // Handle resize logic if needed
-        };
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
-
     return (
         <div style={{ left: !isOpen ? "-1000px" : "" }} className="nav-container position-fixed h-100 mh-100 sidenav d-flex flex-column flex-shrink-0">
             <div className="sidebar-heading p-0 text-center">
@@ -83,7 +75,7 @@ const Sidebar = () => {
             </div>
             <ul className="nav nav-pills flex-column mb-auto mt-1">
                 <div className='nav-item'>
-                    <Link to="/dashboard" className="nav-link px-3 align-middle px-0 d-md-flex align-items-center text-center">
+                    <Link to="/dashboard" className="nav-link px-3">
                         <i className="material-icons">dashboard</i>
                         Dashboard
                     </Link>
@@ -100,7 +92,7 @@ const Sidebar = () => {
                                     )}
                                 </Link>
                             ) : (
-                                <div onClick={() => toggleNav(i)} className={`nav-link px-3 align-middle px-0 d-md-flex align-items-center text-center cursor-pointer child-link ${isCollapsed[i] ? 'a-expanded' : ''}`}>
+                                <div onClick={() => toggleNav(i)} className={`nav-link px-3 d-flex align-middle px-0 d-md-flex align-items-center text-center cursor-pointer child-link ${isCollapsed[i] ? 'a-expanded' : ''}`}>
                                     <i className="material-icons">{nav.icon}</i>
                                     <span className="position-relative d-flex justify-content-between w-75">
                                         <div style={{ fontSize: "16px" }}>{nav.name}</div>
@@ -117,7 +109,7 @@ const Sidebar = () => {
                                     {nav.childs.map((child, j) => (
                                         child.link && (
                                             <li key={j} className={`nav-item sub-nav border-top rounded ${isActive(child.link) ? 'active' : ''}`}>
-                                                <Link to={`/${child.link}`} className="nav-link align-middle px-0 d-md-flex align-items-center text-center">
+                                                <Link to={`/${child.link}`} className="nav-link">
                                                     <i className="material-icons">{child.icon}</i>
                                                     {child.name}
                                                     {child.task_count > 0 && (
@@ -133,7 +125,7 @@ const Sidebar = () => {
                     )
                 ))}
                 <li className="nav-item">
-                    <a href="/manual_book.pdf" target="_blank" className="nav-link px-3 align-middle px-0 d-md-flex align-items-center text-center">
+                    <a href="/manual_book.pdf" target="_blank" className="nav-link px-3">
                         <i className="material-icons">help</i>
                         Help
                     </a>

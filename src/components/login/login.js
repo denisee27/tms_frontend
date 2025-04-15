@@ -1,14 +1,14 @@
 import React, { useState } from "react";
-import { useLoadingService } from "../../Services/loadingservice";
-import { useAuthService } from "../../Services/authservice";
-import { swalToastError } from "../../Services/alertswal";
+import { useLoadingService } from "../../services/loadingservice";
+import { useAuthService } from "../../services/authservice";
+import { swalToastError } from "../../services/alertswal";
 import { useNavigate } from "react-router-dom";
 
 const Login = () => {
-    const [form, setForm] = useState({ email: null, password: null });
+    const [form, setForm] = useState({ email: "", password: "" });
     const [errors, setErrors] = useState({});
     const [isShowPassword, setIsShowPassword] = useState(false);
-    const { loading, loadingstart, loadingdone } = useLoadingService();
+    const { loading } = useLoadingService();
     const { login } = useAuthService();
     const navigate = useNavigate();
 
