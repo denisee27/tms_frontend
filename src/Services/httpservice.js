@@ -1,11 +1,9 @@
 import React, { createContext, useCallback, useContext } from 'react';
-
-
 import { environment } from '../environtments/environtment';
 import { useLoadingService } from './loadingservice';
 import { useAuthService } from './authservice';
-import { swalToastError } from './alertswal';
 import { useInterceptor } from './interceptors';
+import { swalToastError } from './alertswal';
 
 const HttpContext = createContext();
 
@@ -17,8 +15,8 @@ export const HttpService = ({ children }) => {
 
     const handleError = useCallback(async (err) => {
         let errDescription = '';
-        if (err.response) {
-            const { status, data } = err.response;
+        if (err.status) {
+            const { status, data } = err;
             if (status === 401) {
                 errDescription = 'Authorization invalid, please re-login';
                 logout();

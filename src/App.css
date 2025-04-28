@@ -52,6 +52,16 @@ input[type="search"]::-webkit-search-results-decoration {
   vertical-align: top;
 }
 
+.form-floating input:required~label::after {
+  content: '*';
+  color: red;
+  display: inline-block;
+  vertical-align: super;
+  margin-left: 2px;
+  font-size: 0.9em;
+  line-height: 1;
+}
+
 label.floated {
   opacity: 0.65;
   transform: scale(0.85) translateY(-0.2rem) translateX(-1rem);

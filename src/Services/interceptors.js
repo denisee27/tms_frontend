@@ -1,8 +1,7 @@
 import React, { createContext, useContext, useMemo } from 'react';
 import axios from 'axios';
-import { useAuthService } from './authservice'; // pastikan path-nya benar
+import { useAuthService } from './authservice';
 
-// Membuat context
 const InterceptorContext = createContext();
 
 export const InterceptorProvider = ({ children }) => {
@@ -23,7 +22,7 @@ export const InterceptorProvider = ({ children }) => {
                     config.headers = httpHeaders;
                     return config;
                 }
-                const auth = cekAuth(); // pastikan cekAuth tidak undefined
+                const auth = cekAuth();
                 if (auth?.token_type && auth?.access_token) {
                     httpHeaders['Authorization'] = `${auth.token_type} ${auth.access_token}`;
                 }

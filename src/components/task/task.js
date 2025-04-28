@@ -26,12 +26,11 @@ const TaskPage = () => {
     const [sortDueDate, setSortDueDate] = useState();
 
     const fetchTasks = async () => {
-        const response = await get("tasks", { ...queryPage, sortDueDate: sortDueDate });
+        const response = await get(apiUrl, { ...queryPage, sortDueDate: sortDueDate });
         if (response?.success) {
             setDatas(response.response);
         }
     };
-
 
     useEffect(() => {
         fetchTasks();
@@ -39,7 +38,7 @@ const TaskPage = () => {
 
 
     const handleSubmitDelete = async () => {
-        const response = await destroy("tasks/delete/" + formData.id);
+        const response = await destroy(apiUrl + "/delete/" + formData.id);
         if (response.success) {
             swalToastSuccess(`Delete Task Success`);
         }
@@ -61,7 +60,7 @@ const TaskPage = () => {
             ...formData,
             due_date: toYMD(formData.due_date),
         };
-        const response = await put(`${apiUrl}/update/${formData.id}`, formValues);
+        const response = await put(apiUrl + '/update/' + formData.id, formValues);
         if (response.success) {
             swalToastSuccess(`Update Task Success`);
         }
@@ -82,7 +81,7 @@ const TaskPage = () => {
             ...formData,
             due_date: toYMD(formData.due_date),
         };
-        const response = await post(`${apiUrl}/create`, formValues);
+        const response = await post(apiUrl + '/create', formValues);
         if (response.success) {
             swalToastSuccess(`Create Task Success`);
         }
@@ -93,7 +92,7 @@ const TaskPage = () => {
     };
 
     const handleSwitchTask = async (id, status) => {
-        const response = await patch(`${apiUrl}/mark/${id}`, { status: !status });
+        const response = await patch(apiUrl + '/mark/' + id, { status: !status });
         if (response.success) {
             swalToastSuccess(`Marked as completed Update to ${!status ? 'Completed' : 'Pending'}`);
         }
@@ -212,7 +211,7 @@ const TaskPage = () => {
                                                                 </Dropdown.Toggle>
 
                                                                 <Dropdown.Menu>
-                                                                    <Dropdown.Item href="#/action-1" onClick={() => handleEdit(data)}>
+                                                                    <Dropdown.Item onClick={() => handleEdit(data)}>
                                                                         <i className="fa-solid fa-pen me-2"></i>
                                                                         Edit
                                                                     </Dropdown.Item>

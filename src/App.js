@@ -2,18 +2,19 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import './App.css';
 import TaskPage from "./components/task/task";
-import { LoadingProvider } from "./services/loadingservice";
 import Layout from "./layouts/layout";
-import { SidebarProvider } from "./services/sidebarservice";
-import { UtilitiesProvider } from "./services/utilitiesservice";
 import Brand from "./components/brand/brand";
-import { HttpService } from "./services/httpservice";
-import { PageQueryProvider } from "./services/pagequery";
 import Login from "./components/login/login";
-import { AuthProvider } from "./services/authservice";
 import { AfterLoginGuard, BeforeLoginGuard } from "./services/guad";
 import Menu from "./components/menu/menu";
+import { LoadingProvider } from "./services/loadingservice";
+import { AuthProvider } from "./services/authservice";
 import { InterceptorProvider } from "./services/interceptors";
+import { HttpService } from "./services/httpservice";
+import { UtilitiesProvider } from "./services/utilitiesservice";
+import { SidebarProvider } from "./services/sidebarservice";
+import { PageQueryProvider } from "./services/pagequery";
+
 function App() {
   return (
     <LoadingProvider>

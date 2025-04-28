@@ -1,24 +1,30 @@
 import React, { useCallback, useEffect } from 'react';
 import { useState } from 'react';
-import { Button, FloatingLabel, Form, Table } from 'react-bootstrap';
+import { Button, FloatingLabel, Form, InputGroup, Table } from 'react-bootstrap';
 import Modal from 'react-bootstrap/Modal';
 import Dropdown from 'react-bootstrap/Dropdown';
 import "react-date-picker/dist/DatePicker.css";
 import "react-calendar/dist/Calendar.css";
 import moment from 'moment';
-import { swalToastSuccess } from '../../services/alertswal';
 import { toYMD } from '../../services/dateconvert';
-import { useHttpService } from '../../services/httpservice';
 import { usePageQueryService } from '../../services/pagequery';
-
+import { useHttpService } from '../../services/httpservice';
+import { swalToastSuccess } from '../../services/alertswal';
+import Select from 'react-select'
 
 function Menu() {
-    const apiUrl = 'tasks';
+    const apiUrl = 'navigations';
     const initialFormData = {
         title: "",
+        icon: "",
         description: "",
         due_date: "",
     };
+    const options = [
+        { value: 'chocolate', label: 'Chocolate' },
+        { value: 'strawberry', label: 'Strawberry' },
+        { value: 'vanilla', label: 'Vanilla' }
+    ]
     const [formData, setFormData] = useState(initialFormData)
     const { get, destroy, put, post, patch } = useHttpService();
     const { queryPage, setQueryPage } = usePageQueryService();
@@ -27,18 +33,18 @@ function Menu() {
     const [sortDueDate] = useState();
 
     const fetchTasks = useCallback(async () => {
-        const response = await get("tasks", { ...queryPage, sortDueDate: sortDueDate });
+        const response = await get(apiUrl, { ...queryPage, sortDueDate: sortDueDate });
         if (response?.success) {
             setDatas(response.response);
         }
-    }, [get, queryPage, sortDueDate]);
+    }, [queryPage, sortDueDate, get]);
 
     useEffect(() => {
         fetchTasks();
     }, [fetchTasks, queryPage.limit, queryPage.page]);
 
     const handleSubmitDelete = async () => {
-        const response = await destroy("tasks/delete/" + formData.id);
+        const response = await destroy(apiUrl + "/delete/" + formData.id);
         if (response.success) {
             swalToastSuccess(`Delete Task Success`);
         }
@@ -60,7 +66,7 @@ function Menu() {
             ...formData,
             due_date: toYMD(formData.due_date),
         };
-        const response = await put(`${apiUrl}/update/${formData.id}`, formValues);
+        const response = await put(apiUrl + '/update/' + formData.id, formValues);
         if (response.success) {
             swalToastSuccess(`Update Task Success`);
         }
@@ -81,7 +87,7 @@ function Menu() {
             ...formData,
             due_date: toYMD(formData.due_date),
         };
-        const response = await post(`${apiUrl}/create`, formValues);
+        const response = await post(apiUrl + '/create', formValues);
         if (response.success) {
             swalToastSuccess(`Create Task Success`);
         }
@@ -92,7 +98,7 @@ function Menu() {
     };
 
     const handleSwitchTask = async (id, status) => {
-        const response = await patch(`${apiUrl}/mark/${id}`, { status: !status });
+        const response = await patch(apiUrl + '/mark/' + id, { status: !status });
         if (response.success) {
             swalToastSuccess(`Marked as completed Update to ${!status ? 'Completed' : 'Pending'}`);
         }
@@ -143,7 +149,7 @@ function Menu() {
                                 <div className='col-md-6 col-sm-12 d-flex justify-content-end'>
                                     <div className='text-end'>
                                         <Button variant='primary' className='float-left ms-2' onClick={addModal}>
-                                            <i class="fa-solid fa-circle-plus"></i>
+                                            <i className="fa-solid fa-circle-plus"></i>
                                         </Button>
                                         <Button variant='warning' className='float-left ms-2' onClick={() => fetchTasks()}>
                                             <i className="fa-solid fa-arrows-rotate"></i>
@@ -281,57 +287,100 @@ function Menu() {
 
             <Modal show={addshow} onHide={addCloseModal} backdrop="static" keyboard={false} centered>
                 <Modal.Header >
-                    <Modal.Title>Modal title</Modal.Title>
+                    <Modal.Title>Add Menu</Modal.Title>
                 </Modal.Header>
                 <Form noValidate validated={validated} onSubmit={handleSubmit}>
-                    <Modal.Body>
+                    <Modal.Body className='row g-3'>
 
-                        <FloatingLabel label="Title" className="mb-3">
-                            <Form.Control
-                                type="text"
-                                name="title"
-                                value={formData.title}
-                                onChange={handleInput}
-                                required
-                            />
-                            <Form.Control.Feedback type="invalid">Title is required</Form.Control.Feedback>
-                        </FloatingLabel>
+                        <div className='col-12'>
+                            <div label="Parent">
+                                <Select
+                                    isLoading={false}
+                                    isClearable={true}
+                                    placeholder="No Parent"
+                                    isSearchable={true}
+                                    name="parent_id"
 
-                        <FloatingLabel label="Description" className="mb-3">
-                            <Form.Control
-                                as="textarea"
-                                style={{ height: "100px" }}
-                                name="description"
-                                value={formData.description}
-                                onChange={handleInput}
-                                minLength={10}
-                                maxLength={200}
-                                required
-                            />
-                            <div className="invalid-feedback">
-                                Description must be between 10 and 200 characters.
+                                >
+                                    <option value="">No Parent</option>
+                                    <option value="">No Parent</option>
+                                </Select>
                             </div>
-                        </FloatingLabel>
-                        <FloatingLabel label="Due Date" className="mb-3">
-                            <Form.Control
-                                type="date"
-                                name="due_date"
-                                value={formData.due_date}
-                                onChange={handleInput}
-                                required
-                            />
-                            <div className="invalid-feedback">
-                                Date is required
-                            </div>
-                        </FloatingLabel>
-                        <Modal.Footer>
-                            <Button variant="secondary" onClick={() => {
-                                addCloseModal(); setFormData(initialFormData);
-                                setValidated(false);
-                            }}>Close</Button>
-                            <Button type='submit' variant="primary" >Submit</Button>
-                        </Modal.Footer>
+                        </div>
+
+                        <div className='col-12'>
+                            <FloatingLabel label="Name">
+                                <Form.Control
+                                    type="text"
+                                    name="title"
+                                    onChange={handleInput}
+                                    required
+                                />
+                                <Form.Control.Feedback type="invalid">Title is required</Form.Control.Feedback>
+                            </FloatingLabel>
+                        </div>
+
+                        <div className='col-12'>
+                            <InputGroup>
+                                <FloatingLabel label="Icon" className='col'>
+                                    <Form.Control
+                                        type="text"
+                                        name="icon"
+                                        onChange={handleInput}
+                                        style={{ borderTopRightRadius: 0, borderBottomRightRadius: 0 }}
+                                    />
+                                </FloatingLabel>
+                                <InputGroup.Text style={{ width: "50px" }}>
+                                    <span className="material-icons-round">
+                                        {formData.icon}
+                                    </span>
+                                </InputGroup.Text>
+                            </InputGroup>
+                        </div>
+
+                        <div className='col-12'>
+                            <FloatingLabel label="Link">
+                                <Form.Control
+                                    type="text"
+                                    name="link"
+                                    onChange={handleInput}
+                                />
+                                <Form.Control.Feedback type="invalid">Title is required</Form.Control.Feedback>
+                            </FloatingLabel>
+                        </div>
+
+                        <div className='col-12'>
+                            <FloatingLabel label="Position">
+                                <Form.Control
+                                    type="text"
+                                    name="position"
+                                    onChange={handleInput}
+                                    required
+                                />
+                                <Form.Control.Feedback type="invalid">Title is required</Form.Control.Feedback>
+                            </FloatingLabel>
+                        </div>
+
+                        <div className='col-12'>
+                            <FloatingLabel label="Actions">
+                                <Form.Control
+                                    type="text"
+                                    name="action"
+                                    onChange={handleInput}
+                                />
+                                <Form.Control.Feedback type="invalid">Title is required</Form.Control.Feedback>
+                                <span className='text-muted fst-italic'>Comma separated i.e: create,update,delete</span>
+                            </FloatingLabel>
+                        </div>
+
                     </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={() => {
+                            addCloseModal(); setFormData(initialFormData);
+                            setValidated(false);
+                        }}>Close</Button>
+                        <Button type='submit' variant="primary" >Submit</Button>
+                    </Modal.Footer>
                 </Form>
             </Modal>
 
