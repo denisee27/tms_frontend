@@ -15,6 +15,7 @@ export const HttpService = ({ children }) => {
 
     const handleError = useCallback(async (err) => {
         let errDescription = '';
+        console.log(err)
         if (err.status) {
             const { status, data } = err;
             if (status === 401) {
@@ -34,6 +35,7 @@ export const HttpService = ({ children }) => {
             errDescription = 'Unknown Error';
         }
         swalToastError(errDescription, { autoClose: 3000 });
+        logout();
     }, [logout]);
 
     const get = useCallback(async (urlPath, params = {}, noLoading = false) => {

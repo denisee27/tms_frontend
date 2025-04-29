@@ -10,20 +10,21 @@ import { toYMD } from '../../services/dateconvert';
 import { usePageQueryService } from '../../services/pagequery';
 import { useHttpService } from '../../services/httpservice';
 import { swalToastSuccess } from '../../services/alertswal';
-import Select from 'react-select'
+import Select, { components } from 'react-select'
 
 function Menu() {
     const apiUrl = 'navigations';
     const initialFormData = {
-        title: "",
+        name: "",
         icon: "",
-        description: "",
-        due_date: "",
+        position: "",
+        link: "",
+        action: "",
     };
     const options = [
-        { value: 'chocolate', label: 'Chocolate' },
-        { value: 'strawberry', label: 'Strawberry' },
-        { value: 'vanilla', label: 'Vanilla' }
+        { value: '1', label: 'Chocolate' },
+        { value: '2', label: 'Strawberry' },
+        { value: '3', label: 'Vanilla' }
     ]
     const [formData, setFormData] = useState(initialFormData)
     const { get, destroy, put, post, patch } = useHttpService();
@@ -31,6 +32,20 @@ function Menu() {
     const [validated, setValidated] = useState(false);
     const [datas, setDatas] = useState({});
     const [sortDueDate] = useState();
+    const { ValueContainer, Placeholder } = components;
+
+    const CustomValueContainer = ({ children, ...props }) => {
+        return (
+            <ValueContainer {...props}>
+                <Placeholder {...props} isFocused={props.isFocused}>
+                    {props.selectProps.placeholder}
+                </Placeholder>
+                {React.Children.map(children, child =>
+                    child && child.type !== Placeholder ? child : null
+                )}
+            </ValueContainer>
+        );
+    };
 
     const fetchTasks = useCallback(async () => {
         const response = await get(apiUrl, { ...queryPage, sortDueDate: sortDueDate });
@@ -83,11 +98,7 @@ function Menu() {
         if (form.checkValidity() === false) {
             return;
         }
-        const formValues = {
-            ...formData,
-            due_date: toYMD(formData.due_date),
-        };
-        const response = await post(apiUrl + '/create', formValues);
+        const response = await post(apiUrl + '/create', formData);
         if (response.success) {
             swalToastSuccess(`Create Task Success`);
         }
@@ -293,30 +304,46 @@ function Menu() {
                     <Modal.Body className='row g-3'>
 
                         <div className='col-12'>
-                            <div label="Parent">
-                                <Select
-                                    isLoading={false}
-                                    isClearable={true}
-                                    placeholder="No Parent"
-                                    isSearchable={true}
-                                    name="parent_id"
-
-                                >
-                                    <option value="">No Parent</option>
-                                    <option value="">No Parent</option>
-                                </Select>
-                            </div>
+                            <Select
+                                className="basic-single "
+                                classNamePrefix="select"
+                                name="parent_id"
+                                options={options}
+                                isClearable
+                                components={{
+                                    ValueContainer: CustomValueContainer
+                                }}
+                                placeholder="Parent"
+                                styles={{
+                                    valueContainer: (provided) => ({
+                                        ...provided,
+                                        padding: "15px 10px 0px 10px",
+                                        overflow: "visible",
+                                    }),
+                                    placeholder: (provided, state) => ({
+                                        ...provided,
+                                        display: "flex",
+                                        alignItems: "center",
+                                        textAlign: "center",
+                                        position: "absolute",
+                                        paddingBottom: 15,
+                                        top: state.hasValue || state.selectProps.inputValue ? -13 : "",
+                                        transition: "top 0.1s, font-size 0.1s",
+                                        fontSize: (state.hasValue || state.selectProps.inputValue) && 13
+                                    })
+                                }}
+                            />
                         </div>
 
                         <div className='col-12'>
                             <FloatingLabel label="Name">
                                 <Form.Control
                                     type="text"
-                                    name="title"
+                                    name="name"
                                     onChange={handleInput}
                                     required
                                 />
-                                <Form.Control.Feedback type="invalid">Title is required</Form.Control.Feedback>
+                                <Form.Control.Feedback type="invalid">Name is required</Form.Control.Feedback>
                             </FloatingLabel>
                         </div>
 
@@ -345,7 +372,6 @@ function Menu() {
                                     name="link"
                                     onChange={handleInput}
                                 />
-                                <Form.Control.Feedback type="invalid">Title is required</Form.Control.Feedback>
                             </FloatingLabel>
                         </div>
 
@@ -357,7 +383,7 @@ function Menu() {
                                     onChange={handleInput}
                                     required
                                 />
-                                <Form.Control.Feedback type="invalid">Title is required</Form.Control.Feedback>
+                                <Form.Control.Feedback type="invalid">Position is required</Form.Control.Feedback>
                             </FloatingLabel>
                         </div>
 
